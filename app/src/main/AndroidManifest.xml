@@ -20,7 +20,7 @@
 
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
+                android:value="ICON,LONG_TEXT"/>
             <!--
             When your complication data provider is active, UPDATE_PERIOD_SECONDS specifies how
             often you want the system to check for updates to the data. In this case, the time is
