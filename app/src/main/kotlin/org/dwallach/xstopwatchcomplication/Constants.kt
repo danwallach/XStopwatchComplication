@@ -7,24 +7,7 @@
 package org.dwallach.xstopwatchcomplication
 
 object Constants {
-    const val prefStopwatchRunning = "running"
-    const val prefStopwatchReset = "reset"
-    const val prefStopwatchStartTime = "start"
-    const val prefStopwatchBaseTime = "base"
-    const val prefStopwatchUpdateTimestamp = "updateTimestamp"
+    const val ACTION_TIMER_COMPLETE = "org.dwallach.x.timer.ACTION_TIMER_COMPLETE"
 
-    const val sharedPrefsStopwatch = "org.dwallach.x.stopwatch.prefs"
-
-    const val prefTimerRunning = "running"
-    const val prefTimerReset = "reset"
-    const val prefTimerStartTime = "start"
-    const val prefTimerPauseElapsed = "elapsed"
-    const val prefTimerDuration = "duration"
-    const val prefTimerUpdateTimestamp = "updateTimestamp"
-
-    const val sharedPrefsTimer = "org.dwallach.x.timer.prefs"
-
-    const val actionTimerComplete = "org.dwallach.x.timer.ACTION_TIMER_COMPLETE"
-
-    const val timerDefaultDuration = 600000L // 10 minutes in milliseconds
+    const val TIMER_DEFAULT_VALUE = 600000L // 10 minutes in milliseconds
 }

@@ -11,7 +11,7 @@ import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
 import org.jetbrains.anko.verbose
 
-object StopwatchState: SharedState() {
+class StopwatchState(clientId: Int): SharedState(clientId) {
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
@@ -37,13 +37,13 @@ object StopwatchState: SharedState() {
     }
 
     override fun run(context: Context) {
-        startTime = SharedState.currentTime()
+        startTime = currentTime()
 
         super.run(context)
     }
 
     override fun pause(context: Context) {
-        val pauseTime = SharedState.currentTime()
+        val pauseTime = currentTime()
         priorTime += pauseTime - startTime
 
         super.pause(context)
@@ -110,7 +110,7 @@ object StopwatchState: SharedState() {
 /**
  * Kotlin extension functions FTW. This just calls StopwatchState.styleComplicationBuilder.
  */
-fun ComplicationData.Builder.styleStopwatchText(context: Context, small: Boolean): ComplicationData.Builder {
-    StopwatchState.styleComplicationBuilder(context, small, this)
+fun ComplicationData.Builder.styleText(context: Context, small: Boolean, stopwatchState: StopwatchState): ComplicationData.Builder {
+    stopwatchState.styleComplicationBuilder(context, small, this)
     return this
 }

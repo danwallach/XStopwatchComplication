@@ -1,0 +1,21 @@
+Finish stopwatch
+    TODO register for clicks from the watchface
+
+    Notification / activity / menu choices
+        TODO finish porting StopwatchText for use in the notification
+        TODO sort out how to launch a complex notification with multiple choices
+
+Add timer support
+    TODO port over the StopwatchState to fit the new world order
+    TODO time picker fragment
+    TODO verify whether Wear 2.0 has a time picker that actually works
+    TODO yet another notification / activity / menu choices
+    TODO figure out how to set an alarm
+    TODO make sure we can force an update to the watchface
+
+TODO Add preferences saving?
+    TODO what happens on watch restart? Do we get "activated" from scratch? What's the desired behavior?
+
+i18n/l10n
+    TODO bug friends again for i18n text
+    TODO RTOL support?

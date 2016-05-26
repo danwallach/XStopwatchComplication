@@ -18,7 +18,7 @@ import java.util.Observable
 /**
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
-abstract class SharedState: Observable(), AnkoLogger {
+abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
     var isRunning: Boolean = false
         protected set
     var isReset: Boolean = true
@@ -123,7 +123,5 @@ abstract class SharedState: Observable(), AnkoLogger {
 
     abstract val shortName: String
 
-    companion object {
-        fun currentTime() = System.currentTimeMillis()
-    }
+    fun currentTime() = System.currentTimeMillis()
 }

@@ -10,11 +10,13 @@ import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.debug
+import org.jetbrains.anko.error
 import org.jetbrains.anko.warn
+import java.util.*
 
 class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
-    private var isActive = false
     private lateinit var componentName: ComponentName
+
     /*
      * Called when a complication has been activated. The method is for any one-time
      * (per complication) set-up.
@@ -25,9 +27,17 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationActivated(complicationId: Int, dataType: Int, complicationManager: ComplicationManager) {
         debug { "onComplicationActivated(): " + complicationId }
         super.onComplicationActivated(complicationId, dataType, complicationManager);
-        isActive = true
 
         componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
+
+        // It's unclear if we'll ever be activated twice in a row without being deactivated, but we're
+        // taking the strategy of making a new StopwatchState only when one isn't already there, which
+        // is a bit of defensive programming. If the complication is deactivated, then we remove the
+        // corresponding state from the registry, ensuring that there's always fresh state when we
+        // restart.
+
+        if(!registry.containsKey(complicationId))
+            registry.put(complicationId, StopwatchState(complicationId))
     }
 
     /*
@@ -43,6 +53,11 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationUpdate(complicationId: Int, dataType: Int, complicationManager: ComplicationManager) {
         debug("onComplicationUpdate()");
 
+        val state = registry.getOrElse(complicationId) {
+            error { "No stopwatch complication found for id#" + complicationId }
+            return
+        }
+
         val data = when (dataType) {
             ComplicationData.TYPE_ICON ->
                 ComplicationData.Builder(ComplicationData.TYPE_ICON)
@@ -52,13 +67,13 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
             ComplicationData.TYPE_SHORT_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .styleStopwatchText(this, true)
+                        .styleText(this, true, state)
                         .build()
 
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .styleStopwatchText(this, false)
+                        .styleText(this, false, state)
                         .build()
 
             else -> {
@@ -79,7 +94,12 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationDeactivated(complicationId: Int) {
         debug { "onComplicationDeactivated(): " + complicationId }
         super.onComplicationDeactivated(complicationId);
-        isActive = false
+
+        registry.remove(complicationId)
+    }
+
+    companion object {
+        private val registry: MutableMap<Int,StopwatchState> = HashMap()
     }
 }
 
