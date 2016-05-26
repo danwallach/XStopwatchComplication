@@ -39,18 +39,23 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationUpdate(complicationId: Int, dataType: Int, complicationManager: ComplicationManager) {
         debug("onComplicationUpdate()");
 
-        val data: ComplicationData? =
-        when (dataType) {
+        val data = when (dataType) {
             ComplicationData.TYPE_ICON ->
                 ComplicationData.Builder(ComplicationData.TYPE_ICON)
-                    .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                    .build()
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .build()
+
+            ComplicationData.TYPE_SHORT_TEXT ->
+                ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .apply { StopwatchState.styleComplicationBuilder(this@StopwatchProviderService, true, this) }
+                        .build()
 
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
-                    .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                    .setLongText("HelloHello Hello".toComplicationText())
-                    .build()
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .apply { StopwatchState.styleComplicationBuilder(this@StopwatchProviderService, false, this) }
+                        .build()
 
             else -> {
                 warn { "Unexpected complication type: " + dataType }

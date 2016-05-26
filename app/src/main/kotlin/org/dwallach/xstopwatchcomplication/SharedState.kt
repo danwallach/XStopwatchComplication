@@ -7,6 +7,8 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.content.Context
+import android.support.wearable.complications.ComplicationData
+import android.support.wearable.complications.ComplicationText
 import android.text.format.DateUtils
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.verbose
@@ -95,6 +97,12 @@ abstract class SharedState: Observable(), AnkoLogger {
      * @return GMT time in milliseconds
      */
     abstract fun eventTime(): Long
+
+    /**
+     * Convert from the internal representation to a "ComplicationText" object, suitable
+     * for passing to a watchface.
+     */
+    abstract fun styleComplicationBuilder(context: Context, small: Boolean, builder: ComplicationData.Builder): Unit
 
     /**
      * This converts an absolute time, as returned by eventTime, to a relative time

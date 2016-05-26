@@ -7,6 +7,8 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.content.Context
+import android.support.wearable.complications.ComplicationData
+import android.support.wearable.complications.ComplicationText
 import org.jetbrains.anko.verbose
 
 object StopwatchState: SharedState() {
@@ -68,6 +70,32 @@ object StopwatchState: SharedState() {
         } else {
             priorTime
         }
+
+    private fun stopwatchDiffText(start: Long): ComplicationText =
+            ComplicationText.TimeDifferenceBuilder()
+                    .setReferencePeriodEnd(start)
+                    .setStyle(ComplicationText.DIFFERENCE_STYLE_STOPWATCH)
+                    .build()
+
+
+    override fun styleComplicationBuilder(context: Context, small: Boolean, builder: ComplicationData.Builder) {
+        if(isReset) return // we'll set no styles when the stopwatch is zeroed
+
+        val complicationText = when {
+            isRunning -> stopwatchDiffText(startTime - priorTime)
+
+        // complicated way of finding out how to represent "0"
+//            isReset -> stopwatchDiffText(startTime).getText(context, startTime).toString().toComplicationText()
+
+        // complicated way of finding how how to represent the time when the user hit "pause"
+            else -> stopwatchDiffText(startTime - priorTime).getText(context, startTime).toString().toComplicationText()
+        }
+
+        if(small)
+            builder.setShortText(complicationText)
+        else
+            builder.setLongText(complicationText)
+    }
 
     override val selectedIconID: Int
         get() = R.drawable.ic_stopwatch_selected
