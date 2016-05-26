@@ -5,6 +5,7 @@
 
 package org.dwallach.xstopwatchcomplication
 
+import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.AnkoLogger
@@ -12,7 +13,8 @@ import org.jetbrains.anko.debug
 import org.jetbrains.anko.warn
 
 class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
-    var isActive = false
+    private var isActive = false
+    private lateinit var componentName: ComponentName
     /*
      * Called when a complication has been activated. The method is for any one-time
      * (per complication) set-up.
@@ -24,6 +26,8 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         debug { "onComplicationActivated(): " + complicationId }
         super.onComplicationActivated(complicationId, dataType, complicationManager);
         isActive = true
+
+        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
     }
 
     /*
@@ -48,13 +52,13 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
             ComplicationData.TYPE_SHORT_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .apply { StopwatchState.styleComplicationBuilder(this@StopwatchProviderService, true, this) }
+                        .styleStopwatchText(this, true)
                         .build()
 
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .apply { StopwatchState.styleComplicationBuilder(this@StopwatchProviderService, false, this) }
+                        .styleStopwatchText(this, false)
                         .build()
 
             else -> {
@@ -79,7 +83,4 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     }
 }
 
-/**
- * Converts any string to a plain ComplicationText
- */
-fun String.toComplicationText() = ComplicationText.plainText(this)
+

@@ -106,3 +106,11 @@ object StopwatchState: SharedState() {
     override val shortName: String
         get() = "[Stopwatch] "
 }
+
+/**
+ * Kotlin extension functions FTW. This just calls StopwatchState.styleComplicationBuilder.
+ */
+fun ComplicationData.Builder.styleStopwatchText(context: Context, small: Boolean): ComplicationData.Builder {
+    StopwatchState.styleComplicationBuilder(context, small, this)
+    return this
+}
