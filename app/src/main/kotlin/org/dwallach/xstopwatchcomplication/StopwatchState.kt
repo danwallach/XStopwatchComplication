@@ -56,7 +56,6 @@ class StopwatchState(clientId: Int): SharedState(clientId) {
         this.isRunning = running
         this.isReset = reset
         this.updateTimestamp = updateTimestamp
-        this.isInitialized = true
 
         pingObservers()
     }

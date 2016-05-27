@@ -6,14 +6,14 @@
  */
 package org.dwallach.xstopwatchcomplication
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.support.wearable.complications.ComplicationData
-import android.support.wearable.complications.ComplicationText
 import android.text.format.DateUtils
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.verbose
-
-import java.util.Observable
+import java.util.*
 
 /**
  * We'll implement this abstract class for StopwatchState and TimerState.
@@ -29,13 +29,10 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
         set(visible) {
             verbose { "${shortName} visible: $visible" }
             field = visible
-            isInitialized = true
 
             makeUpdateTimestamp()
             pingObservers()
         }
-    var isInitialized: Boolean = false
-        protected set
 
     private fun makeUpdateTimestamp() {
         updateTimestamp = currentTime()
@@ -45,10 +42,14 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
         verbose { "${shortName} reset" }
         isRunning = false
         isReset = true
-        isInitialized = true
 
         makeUpdateTimestamp()
         pingObservers()
+    }
+
+    open fun alarm(context: Context) {
+        verbose { "${shortName} alarm!" }
+        // the timer will do more with this; it's meaningless for the stopwatch
     }
 
     open fun run(context: Context) {
@@ -56,7 +57,6 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
 
         isReset = false
         isRunning = true
-        isInitialized = true
 
         makeUpdateTimestamp()
         pingObservers()
@@ -66,7 +66,6 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
         verbose { "${shortName} pause" }
 
         isRunning = false
-        isInitialized = true
 
         makeUpdateTimestamp()
         pingObservers()
@@ -124,4 +123,47 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
     abstract val shortName: String
 
     fun currentTime() = System.currentTimeMillis()
+
+    /**
+     * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
+     * This is called when the complication is activated.
+     */
+    fun register(context: Context) {
+        stateRegistry.put(complicationId, this)
+
+        // we only ever have to do this once, regardless of registration and deregistration
+
+        if(intentRegistry[complicationId] == null) {
+            val intent = Intent(Constants.ACTION_COMPLICATION_CLICK, null, context, NotificationService::class.java)
+            intent.extras.putInt("complicationId", complicationId)
+            val pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            intentRegistry.put(complicationId, pendingIntent)
+        }
+    }
+
+    /**
+     * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
+     * This is called when the complication is deactivated.
+     */
+    fun deregister() {
+        stateRegistry.remove(complicationId)
+    }
+
+    companion object {
+        private val stateRegistry: MutableMap<Int,SharedState> = HashMap()
+        private val intentRegistry: MutableMap<Int,PendingIntent> = HashMap()
+
+        /**
+         * Fetch the shared state for a given complication. Results might be null
+         * if there is no such complication.
+         */
+        operator fun get(complicationId: Int) = stateRegistry.get(complicationId)
+
+        /**
+         * Fetch the pending intent for a given complication. Results might be null
+         * if there is no such complication.
+         */
+        fun getIntent(complicationId: Int) = intentRegistry.get(complicationId)
+    }
 }
