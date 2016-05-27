@@ -5,6 +5,8 @@ Finish stopwatch
         TODO finish porting StopwatchText for use in the notification
         TODO sort out how to launch a complex notification with multiple choices
 
+        TODO watch the video: https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
+
 Add timer support
     DONE? port over the StopwatchState to fit the new world order
     TODO time picker fragment
