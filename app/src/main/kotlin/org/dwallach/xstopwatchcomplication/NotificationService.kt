@@ -27,29 +27,11 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         verbose("onCreate")
     }
 
-    override fun onHandleIntent(intent: Intent) {
-        val action = intent.action
-        val complicationId = intent.extras.getInt("complicationId", -1)
-
-        verbose { "onHandleIntent: action($action), complicationId($complicationId)" }
-
-        if(action != Intent.ACTION_DEFAULT && complicationId == -1)
-            throw InternalError("Intent for unknown complication: $complicationId")
-
-        when(action) {
-            Intent.ACTION_DEFAULT -> verbose("kickstart launch!")
-
-            Constants.ACTION_COMPLICATION_CLICK -> SharedState[complicationId]?.click(this)
-
-            Constants.ACTION_TIMER_COMPLETE -> SharedState[complicationId]?.alarm(this)
-
-            else -> throw InternalError("Undefined action: $action")
-        }
-    }
+    override fun onHandleIntent(intent: Intent) = handleIntent(intent)
 
     companion object: AnkoLogger {
         var singletonService: NotificationService? = null
-
+        private set
 
         /**
          * Start the notification service, if it's not already running. This is the service
@@ -61,6 +43,40 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
             if (singletonService == null) {
                 verbose("launching watch calendar service")
                 context.startService(context.intentFor<NotificationService>().setAction(Intent.ACTION_DEFAULT))
+            }
+        }
+
+        /**
+         * Given an intent, crack it open and figure out what we're supposed to do with it.
+         * This might have arrived via the NotificationService or the BroadcastReceiver. Whatever.
+         * It's dispatched here.
+         */
+        fun handleIntent(intent: Intent) {
+            val action = intent.action
+            val complicationId = intent.extras.getInt(Constants.COMPLICATION_ID, -1)
+            val context = singletonService
+
+            verbose { "onHandleIntent: action($action), complicationId($complicationId)" }
+
+            if(action == Intent.ACTION_DEFAULT || action == Intent.ACTION_BOOT_COMPLETED) {
+                verbose("kickstart launch, we're good to go")
+                return
+            }
+
+            if(complicationId == -1)
+                throw InternalError("Intent for unknown complication: $complicationId")
+
+            if(context == null) {
+                error("no service yet for handleIntent context")
+                return
+            }
+
+            when(action) {
+                Constants.ACTION_COMPLICATION_CLICK -> SharedState[complicationId]?.click(context)
+
+                Constants.ACTION_TIMER_COMPLETE -> SharedState[complicationId]?.alarm(context)
+
+                else -> throw InternalError("Undefined action: $action")
             }
         }
     }

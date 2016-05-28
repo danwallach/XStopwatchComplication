@@ -135,7 +135,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
 
         if(intentRegistry[complicationId] == null) {
             val intent = Intent(Constants.ACTION_COMPLICATION_CLICK, null, context, NotificationService::class.java)
-            intent.extras.putInt("complicationId", complicationId)
+            intent.extras.putInt(Constants.COMPLICATION_ID, complicationId)
             val pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             intentRegistry.put(complicationId, pendingIntent)

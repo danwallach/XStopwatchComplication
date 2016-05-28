@@ -3,10 +3,14 @@ Finish stopwatch
 
     Notification / activity / menu choices
         TODO finish porting StopwatchText for use in the notification
-        TODO RemoteInput: set up the array of buttons 
+        TODO RemoteInput: set up the array of buttons
+        https://developer.android.com/preview/features/notification-updates.html
+        -- the strategy seems to be treating this like a text field with a fixed set of "choices"
 	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications) 
 	TODO setColor for tinting (different for stopwatch / timer)
 	TODO Use of chronometer feature
+	TODO Add BroadcastReceiver for boot-completed and results from pending intents
+	TODO manifest.xml with all the trimmings
 
         Further details, Google IO video:
 	https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
@@ -22,6 +26,7 @@ Add timer support
 
 Add preferences saving?
     TODO dump all SharedState instances so they can be restored later?
+    TODO how do we know when we're being restored?
 
 i18n/l10n
     TODO bug friends again for i18n text
