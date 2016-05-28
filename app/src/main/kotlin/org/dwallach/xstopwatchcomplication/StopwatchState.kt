@@ -7,11 +7,12 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
 import org.jetbrains.anko.verbose
 
-class StopwatchState(clientId: Int, updateFunc: (SharedState) -> Unit = {}): SharedState(clientId, updateFunc) {
+class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): SharedState(complicationId, prefs) {
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
@@ -25,11 +26,11 @@ class StopwatchState(clientId: Int, updateFunc: (SharedState) -> Unit = {}): Sha
         private set
 
     init {
-        priorTime = 0
-        startTime = 0
+        priorTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0) ?: 0
+        startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
     }
 
-    override fun reset(context: Context?) {
+    override fun reset(context: Context) {
         priorTime = 0
         startTime = 0
 
@@ -49,15 +50,11 @@ class StopwatchState(clientId: Int, updateFunc: (SharedState) -> Unit = {}): Sha
         super.pause(context)
     }
 
-    fun restoreState(priorTime: Long, startTime: Long, running: Boolean, reset: Boolean, updateTimestamp: Long) {
-        verbose("restoring state")
-        this.priorTime = priorTime
-        this.startTime = startTime
-        this.isRunning = running
-        this.isReset = reset
-        this.updateTimestamp = updateTimestamp
+    override fun saveState(editor: SharedPreferences.Editor) {
+        super.saveState(editor)
 
-        handleUpdates()
+        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", priorTime)
+        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", startTime)
     }
 
     override fun eventTime(): Long =
@@ -102,8 +99,8 @@ class StopwatchState(clientId: Int, updateFunc: (SharedState) -> Unit = {}): Sha
     override val flatIconID: Int
         get() = R.drawable.ic_stopwatch_flat
 
-    override val shortName: String
-        get() = "[Stopwatch] "
+    override val type: String
+        get() = Constants.TYPE_STOPWATCH
 }
 
 /**

@@ -25,6 +25,14 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
     override fun onCreate() {
         super.onCreate()
         verbose("onCreate")
+
+        SharedState.restoreEverything(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // we're only doing this so we can log when we get destroyed, which will help us debug things
+        verbose("onDestroy")
     }
 
     override fun onHandleIntent(intent: Intent) = handleIntent(intent)

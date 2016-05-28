@@ -7,9 +7,23 @@
 package org.dwallach.xstopwatchcomplication
 
 object Constants {
-    const val ACTION_TIMER_COMPLETE = "org.dwallach.x.timer.ACTION_TIMER_COMPLETE"
-    const val ACTION_COMPLICATION_CLICK = "org.dwallach.x.CLICK"
+    const val PREFIX = "org.dwallach.xcomplications"
+    const val PREFERENCES = "$PREFIX.prefs"
+    const val ACTION_TIMER_COMPLETE = "$PREFIX.timer.ACTION_TIMER_COMPLETE"
+    const val ACTION_COMPLICATION_CLICK = "$PREFIX.CLICK"
     const val COMPLICATION_ID = "complicationId"
+    const val PREFERENCES_VERSION = 1
+
+    const val TYPE_STOPWATCH = "stopwatch"
+    const val TYPE_TIMER = "timer"
+
+    const val SUFFIX_TYPE = ".type"
+    const val SUFFIX_RUNNING = ".running"
+    const val SUFFIX_RESET = ".reset"
+
+    // stopwatch-specific
+    const val SUFFIX_START_TIME = ".startTime"
+    const val SUFFIX_PRIOR_TIME = ".priorTime"
 
     const val TIMER_DEFAULT_VALUE = 600000L // 10 minutes in milliseconds
 }

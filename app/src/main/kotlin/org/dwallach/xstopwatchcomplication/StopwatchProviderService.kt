@@ -11,7 +11,6 @@ import android.support.wearable.complications.*
 import org.jetbrains.anko.*
 
 class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
-    private lateinit var componentName: ComponentName
 
     /*
      * Called when a complication has been activated. The method is for any one-time
@@ -24,9 +23,8 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         debug { "onComplicationActivated(): complicationId($complicationId), complicationType($complicationType)" }
         super.onComplicationActivated(complicationId, complicationType, complicationManager);
 
-        restoreState()
         StopwatchState(complicationId).register(this) // create state for the complication and save it away
-        saveState()
+        SharedState.saveEverything(this)
     }
 
     /*
@@ -42,18 +40,14 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
         debug("onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)");
 
-        var state = SharedState[complicationId]
+        val state = SharedState[complicationId]
         if(state == null) {
             error { "No stopwatch complication found for id# $complicationId" }
             return
         }
         if(state !is StopwatchState) {
-            // dealing with case #1 in the comment above
-            info { "complicationId($complicationId) wasn't stopwatch! Updating." }
-            SharedState[complicationId]?.deregister()
-            state = StopwatchState(complicationId)
-            state.register(this)
-            saveState()
+            error { "complicationId($complicationId) wasn't a stopwatch!" }
+            return
         }
 
         val data = when (complicationType) {
@@ -97,29 +91,27 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         super.onComplicationDeactivated(complicationId);
 
         SharedState[complicationId]?.deregister()
-        saveState()
+        SharedState.saveEverything(this)
     }
 
     override fun onCreate() {
+        super.onCreate()
         verbose("onCreate")
-        restoreState()
+
+        NotificationService.kickStart(this) // start the service if it's not already active
+        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
+        SharedState.restoreEverything(this)
     }
 
     override fun onDestroy() {
-        // TODO save state?!
+        super.onDestroy()
+        // we're only doing this so we can log when we get destroyed, which will help us debug things
         verbose("onDestroy")
     }
 
-    private fun restoreState() {
-        NotificationService.kickStart(this) // start the service if it's not already active
-        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
 
-        // TODO pull content in from the on-disk preferences
-    }
-
-    private fun saveState() {
-        // TODO dump state to on-disk preferences
+    companion object {
+        var componentName: ComponentName? = null
+        private set
     }
 }
-
-

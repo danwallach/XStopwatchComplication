@@ -2,16 +2,15 @@ Finish stopwatch
     DONE? register for clicks from the watchface
 
     Notification / activity / menu choices
-        TODO finish porting StopwatchText for use in the notification
         TODO "MediaStyle" notification with buttons (actions -> pending intents -> our notification service)
+        TODO Use of chronometer feature
+        Further details, Google IO video:
+        https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
+
 	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications)
 	TODO setColor for tinting (different for stopwatch / timer)
-	TODO Use of chronometer feature
 	DONE? Add BroadcastReceiver for boot-completed and results from pending intents
 	TODO manifest.xml with all the trimmings
-
-        Further details, Google IO video:
-	https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
 
 	TODO set desired order of complications (small, big, icon-only, etc.)
 
@@ -25,9 +24,14 @@ Add timer support
     TODO make sure we can kill alarms when a complication is deregistered
 
 Add preferences saving?
-    TODO dump all SharedState instances so they can be restored later?
-    TODO how do we know when we're being restored?
+    DONE? dump all SharedState instances so they can be restored later?
+    DONE? how do we know when we're being restored?
     -- in theory, we're just a normal service, so we can have onCreate and onDestroy
+
+Lifecyle goodies
+    Two sorts of services: NotificationService and *ProviderService; both now will restore state, if necessary
+    TODO who actually gets killed when?
+    TODO verify that notification update pipeline (which roundtrips with the watchface) actually works
 
 i18n/l10n
     TODO bug friends again for i18n text
