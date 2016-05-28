@@ -8,10 +8,7 @@ package org.dwallach.xstopwatchcomplication
 import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-import org.jetbrains.anko.error
-import org.jetbrains.anko.warn
+import org.jetbrains.anko.*
 
 class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     private lateinit var componentName: ComponentName
@@ -23,13 +20,13 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      * You can continue sending data for the active complicationId until onComplicationDeactivated()
      * is called.
      */
-    override fun onComplicationActivated(complicationId: Int, dataType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationActivated(): " + complicationId }
-        super.onComplicationActivated(complicationId, dataType, complicationManager);
+    override fun onComplicationActivated(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
+        debug { "onComplicationActivated(): complicationId($complicationId), complicationType($complicationType)" }
+        super.onComplicationActivated(complicationId, complicationType, complicationManager);
 
-        NotificationService.kickStart(this) // start the service if it's not already active
-        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
+        restoreState()
         StopwatchState(complicationId).register(this) // create state for the complication and save it away
+        saveState()
     }
 
     /*
@@ -42,21 +39,24 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      *   4. You triggered an update from your own class via the
      *       ProviderUpdateRequester.requestUpdate() method.
      */
-    override fun onComplicationUpdate(complicationId: Int, dataType: Int, complicationManager: ComplicationManager) {
-        debug("onComplicationUpdate()");
+    override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
+        debug("onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)");
 
-        val state = SharedState[complicationId]
+        var state = SharedState[complicationId]
         if(state == null) {
-            error { "No stopwatch complication found for id#" + complicationId }
+            error { "No stopwatch complication found for id# $complicationId" }
             return
         }
         if(state !is StopwatchState) {
-            error { "Wrong complication type for id#" + complicationId }
-            return
+            // dealing with case #1 in the comment above
+            info { "complicationId($complicationId) wasn't stopwatch! Updating." }
+            SharedState[complicationId]?.deregister()
+            state = StopwatchState(complicationId)
+            state.register(this)
+            saveState()
         }
 
-
-        val data = when (dataType) {
+        val data = when (complicationType) {
             ComplicationData.TYPE_ICON ->
                 ComplicationData.Builder(ComplicationData.TYPE_ICON)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
@@ -78,7 +78,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
                         .build()
 
             else -> {
-                warn { "Unexpected complication type: " + dataType }
+                warn { "Unexpected complication type: $complicationType" }
                 null
             }
         }
@@ -93,10 +93,32 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      * manager outside of this class with updates, you will want to update your class to stop.
      */
     override fun onComplicationDeactivated(complicationId: Int) {
-        debug { "onComplicationDeactivated(): " + complicationId }
+        debug { "onComplicationDeactivated: $complicationId" }
         super.onComplicationDeactivated(complicationId);
 
         SharedState[complicationId]?.deregister()
+        saveState()
+    }
+
+    override fun onCreate() {
+        verbose("onCreate")
+        restoreState()
+    }
+
+    override fun onDestroy() {
+        // TODO save state?!
+        verbose("onDestroy")
+    }
+
+    private fun restoreState() {
+        NotificationService.kickStart(this) // start the service if it's not already active
+        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
+
+        // TODO pull content in from the on-disk preferences
+    }
+
+    private fun saveState() {
+        // TODO dump state to on-disk preferences
     }
 }
 

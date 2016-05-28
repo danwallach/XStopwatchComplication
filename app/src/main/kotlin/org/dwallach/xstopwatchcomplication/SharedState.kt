@@ -18,7 +18,7 @@ import java.util.*
 /**
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
-abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
+abstract class SharedState(val complicationId: Int, val updateFunc: (SharedState) -> Unit = {}): AnkoLogger {
     var isRunning: Boolean = false
         protected set
     var isReset: Boolean = true
@@ -30,12 +30,12 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
             verbose { "${shortName} visible: $visible" }
             field = visible
 
-            makeUpdateTimestamp()
-            pingObservers()
+            handleUpdates()
         }
 
-    private fun makeUpdateTimestamp() {
+    protected fun handleUpdates() {
         updateTimestamp = currentTime()
+        updateFunc(this)
     }
 
     open fun reset(context: Context?) {
@@ -43,8 +43,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
         isRunning = false
         isReset = true
 
-        makeUpdateTimestamp()
-        pingObservers()
+        handleUpdates()
     }
 
     open fun alarm(context: Context) {
@@ -58,8 +57,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
         isReset = false
         isRunning = true
 
-        makeUpdateTimestamp()
-        pingObservers()
+        handleUpdates()
     }
 
     open fun pause(context: Context) {
@@ -67,8 +65,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
 
         isRunning = false
 
-        makeUpdateTimestamp()
-        pingObservers()
+        handleUpdates()
     }
 
     fun click(context: Context) {
@@ -77,15 +74,6 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
             pause(context)
         else
             run(context)
-    }
-
-    fun pingObservers() {
-        // this incantation will make observers elsewhere aware that there's new content
-        verbose { "${shortName} pinging" }
-        setChanged()
-        notifyObservers()
-        clearChanged()
-        verbose { "${shortName} ping complete" }
     }
 
     /**
@@ -128,8 +116,8 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
      * This is called when the complication is activated.
      */
-    fun register(context: Context) {
-        stateRegistry.put(complicationId, this)
+    open fun register(context: Context) {
+        stateRegistry[complicationId] = this
 
         // we only ever have to do this once, regardless of registration and deregistration
 
@@ -138,7 +126,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
             intent.extras.putInt(Constants.COMPLICATION_ID, complicationId)
             val pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            intentRegistry.put(complicationId, pendingIntent)
+            intentRegistry[complicationId] = pendingIntent
         }
     }
 
@@ -146,7 +134,7 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
      * This is called when the complication is deactivated.
      */
-    fun deregister() {
+    open fun deregister() {
         stateRegistry.remove(complicationId)
     }
 
@@ -158,12 +146,12 @@ abstract class SharedState(val complicationId: Int): Observable(), AnkoLogger {
          * Fetch the shared state for a given complication. Results might be null
          * if there is no such complication.
          */
-        operator fun get(complicationId: Int) = stateRegistry.get(complicationId)
+        operator fun get(complicationId: Int) = stateRegistry[complicationId]
 
         /**
          * Fetch the pending intent for a given complication. Results might be null
          * if there is no such complication.
          */
-        fun getIntent(complicationId: Int) = intentRegistry.get(complicationId)
+        fun getIntent(complicationId: Int) = intentRegistry[complicationId]
     }
 }

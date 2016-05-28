@@ -11,7 +11,7 @@ import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
 import org.jetbrains.anko.verbose
 
-class StopwatchState(clientId: Int): SharedState(clientId) {
+class StopwatchState(clientId: Int, updateFunc: (SharedState) -> Unit = {}): SharedState(clientId, updateFunc) {
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
@@ -57,7 +57,7 @@ class StopwatchState(clientId: Int): SharedState(clientId) {
         this.isReset = reset
         this.updateTimestamp = updateTimestamp
 
-        pingObservers()
+        handleUpdates()
     }
 
     override fun eventTime(): Long =
