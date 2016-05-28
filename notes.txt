@@ -3,9 +3,13 @@ Finish stopwatch
 
     Notification / activity / menu choices
         TODO finish porting StopwatchText for use in the notification
-        TODO sort out how to launch a complex notification with multiple choices
+        TODO RemoteInput: set up the array of buttons 
+	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications) 
+	TODO setColor for tinting (different for stopwatch / timer)
+	TODO Use of chronometer feature
 
-        TODO watch the video: https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
+        Further details, Google IO video:
+	https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
 
 Add timer support
     DONE? port over the StopwatchState to fit the new world order
@@ -14,9 +18,10 @@ Add timer support
     TODO yet another notification / activity / menu choices
     TODO figure out how to set an alarm
     TODO make sure we can force an update to the watchface
+    TODO make sure we can kill alarms when a complication is deregistered
 
-TODO Add preferences saving?
-    TODO what happens on watch restart? Do we get "activated" from scratch? What's the desired behavior?
+Add preferences saving?
+    TODO dump all SharedState instances so they can be restored later?
 
 i18n/l10n
     TODO bug friends again for i18n text
