@@ -99,7 +99,6 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         verbose("onCreate")
 
         NotificationService.kickStart(this) // start the service if it's not already active
-        componentName = ComponentName(this, javaClass) // we might need this if we want to force an update
         SharedState.restoreEverything(this)
     }
 
@@ -111,7 +110,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
 
 
     companion object {
-        var componentName: ComponentName? = null
-        private set
+        // this is necessary for notifying the watchface that it needs to talk back to us
+        val componentName = ComponentName.createRelative(".", "StopwatchProviderService")
     }
 }
