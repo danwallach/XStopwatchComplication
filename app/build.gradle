@@ -43,7 +43,7 @@ def getVersionName = { ->
 }
 
 buildscript {
-    ext.kotlin_version = '1.0.2'
+    ext.kotlin_version = '1.0.3-eap-30'
     ext.anko_version = '0.8.3'
     repositories {
         mavenCentral()
@@ -60,13 +60,13 @@ buildscript {
 
 android {
     compileSdkVersion 'android-N'
-    buildToolsVersion '24.0.0-rc3'
+    buildToolsVersion '24.0.0-rc4'
     defaultConfig {
         applicationId "org.dwallach.xstopwatchcomplication"
         minSdkVersion 'N'
         targetSdkVersion 'N'
-        versionCode 1
-        versionName "1.0"
+        versionCode getVersionCode()
+        versionName getVersionName()
     }
     buildTypes {
         release {
@@ -82,7 +82,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:2.0.0-alpha1'
-    compile 'com.google.android.gms:play-services-wearable:9.0.1'
+    compile 'com.google.android.gms:play-services-wearable:9.0.2'
 
     compile 'com.android.support:palette-v7:23.4.0'
     compile 'com.android.support:support-v13:23.4.0'
