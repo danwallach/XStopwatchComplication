@@ -10,9 +10,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
-import org.jetbrains.anko.verbose
+import org.jetbrains.anko.*
 
-class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): SharedState(complicationId, prefs) {
+class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): SharedState(complicationId, prefs), AnkoLogger {
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
@@ -28,6 +28,13 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     init {
         priorTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0) ?: 0
         startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
+    }
+
+    override fun saveState(editor: SharedPreferences.Editor) {
+        super.saveState(editor)
+
+        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", priorTime)
+        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", startTime)
     }
 
     override fun reset(context: Context) {
@@ -48,13 +55,6 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         priorTime += pauseTime - startTime
 
         super.pause(context)
-    }
-
-    override fun saveState(editor: SharedPreferences.Editor) {
-        super.saveState(editor)
-
-        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", priorTime)
-        editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", startTime)
     }
 
     override fun eventTime(): Long =
@@ -101,12 +101,15 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
 
     override val type: String
         get() = Constants.TYPE_STOPWATCH
+
+    override val shortName: String
+        get() = "[Stopwatch] "
 }
 
 /**
  * Kotlin extension functions FTW. This just calls StopwatchState.styleComplicationBuilder.
  */
-fun ComplicationData.Builder.styleText(context: Context, small: Boolean, stopwatchState: StopwatchState): ComplicationData.Builder {
+fun ComplicationData.Builder.styleStopwatchText(context: Context, small: Boolean, stopwatchState: StopwatchState): ComplicationData.Builder {
     stopwatchState.styleComplicationBuilder(context, small, this)
     return this
 }

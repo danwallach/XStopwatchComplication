@@ -61,31 +61,37 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
          */
         fun handleIntent(intent: Intent) {
             val action = intent.action
-            val complicationId = intent.extras.getInt(Constants.COMPLICATION_ID, -1)
             val context = singletonService
 
-            verbose { "onHandleIntent: action($action), complicationId($complicationId)" }
+            verbose { "onHandleIntent: action($action)" }
 
             if(action == Intent.ACTION_DEFAULT || action == Intent.ACTION_BOOT_COMPLETED) {
                 verbose("kickstart launch, we're good to go")
                 return
             }
 
-            if(complicationId == -1)
-                throw InternalError("Intent for unknown complication: $complicationId")
-
             if(context == null) {
                 error("no service yet for handleIntent context")
                 return
             }
 
-            when(action) {
-                Constants.ACTION_COMPLICATION_CLICK -> SharedState[complicationId]?.click(context)
-
-                Constants.ACTION_TIMER_COMPLETE -> SharedState[complicationId]?.alarm(context)
-
-                else -> throw InternalError("Undefined action: $action")
+            // We could have multiple timers, so each one will have its own action, which
+            // is just the same prefix with the complicationId bolted on at the end.
+            if(action.startsWith(Constants.ACTION_TIMER_COMPLETE)) {
+                val complicationId = action.substring(Constants.ACTION_TIMER_COMPLETE.length).toInt()
+                SharedState[complicationId]?.alarm(context)
+                return
             }
+
+            // In this case, we're getting a click from the complication. Same encoding as above.
+            if(action.startsWith(Constants.ACTION_COMPLICATION_CLICK)) {
+                val complicationId = action.substring(Constants.ACTION_COMPLICATION_CLICK.length).toInt()
+                SharedState[complicationId]?.alarm(context)
+                return
+            }
+
+
+            throw InternalError("Undefined action: $action")
         }
     }
 }

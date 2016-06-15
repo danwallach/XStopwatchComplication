@@ -5,12 +5,11 @@
 
 package org.dwallach.xstopwatchcomplication
 
-import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.*
 
-class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
+class TimerProviderService: ComplicationProviderService(), AnkoLogger {
 
     /*
      * Called when a complication has been activated. The method is for any one-time
@@ -23,7 +22,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         debug { "onComplicationActivated(): complicationId($complicationId), complicationType($complicationType)" }
         super.onComplicationActivated(complicationId, complicationType, complicationManager);
 
-        StopwatchState(complicationId).register(this) // create state for the complication and save it away
+        TimerState(complicationId).register(this) // create state for the complication and save it away
         SharedState.saveEverything(this)
     }
 
@@ -42,33 +41,34 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
 
         val state = SharedState[complicationId]
         if(state == null) {
-            error { "No stopwatch complication found for id# $complicationId" }
+            error { "No timer complication found for id# $complicationId" }
             return
         }
-        if(state !is StopwatchState) {
-            error { "complicationId($complicationId) wasn't a stopwatch!" }
+
+        if(state !is TimerState) {
+            error { "complicationId($complicationId) wasn't a timer!" }
             return
         }
 
         val data = when (complicationType) {
             ComplicationData.TYPE_ICON ->
                 ComplicationData.Builder(ComplicationData.TYPE_ICON)
-                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_sandwatch_flat))
                         .setTapAction(SharedState.getIntent(complicationId))
                         .build()
 
             ComplicationData.TYPE_SHORT_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
-                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_sandwatch_flat))
                         .setTapAction(SharedState.getIntent(complicationId))
-                        .styleStopwatchText(this, true, state)
+                        .styleTimerText(this, true, state)
                         .build()
 
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
-                        .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_sandwatch_flat))
                         .setTapAction(SharedState.getIntent(complicationId))
-                        .styleStopwatchText(this, false, state)
+                        .styleTimerText(this, false, state)
                         .build()
 
             else -> {
@@ -109,8 +109,8 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     }
 
 
-    companion object {
-        // this is necessary for notifying the watchface that it needs to talk back to us
-        val componentName = ComponentName.createRelative(".", "StopwatchProviderService")
-    }
+//    companion object {
+        // this might be necessary later for notifying the watchface that it needs to talk back to us
+//        val componentName = ComponentName.createRelative(".", "TimerProviderService")
+//    }
 }

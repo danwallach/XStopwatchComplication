@@ -16,7 +16,7 @@ buildscript {
         // https://discuss.kotlinlang.org/t/kotlin-plugin-in-android-studio-2-2-preview-1-not-working/1684
 
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha2'
+        classpath 'com.android.tools.build:gradle:2.2.0-alpha3'
         // classpath 'com.android.tools.build:gradle:2.1.0'
     }
 }

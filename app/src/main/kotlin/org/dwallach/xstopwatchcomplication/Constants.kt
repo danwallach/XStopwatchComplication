@@ -25,5 +25,9 @@ object Constants {
     const val SUFFIX_START_TIME = ".startTime"
     const val SUFFIX_PRIOR_TIME = ".priorTime"
 
+    // timer-specific
+    const val SUFFIX_ELAPSED_TIME = ".elapsedTime"
+    const val SUFFIX_DURATION = ".duration"
+
     const val TIMER_DEFAULT_VALUE = 600000L // 10 minutes in milliseconds
 }

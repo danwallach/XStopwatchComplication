@@ -137,6 +137,8 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
 
     abstract val selectedIconID: Int
 
+    abstract val shortName: String
+
     /**
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
      * This is called when the complication is activated.
@@ -147,11 +149,9 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         // we only ever have to do this once, regardless of registration and deregistration
 
         if(intentRegistry[complicationId] == null) {
-            val intent = Intent(Constants.ACTION_COMPLICATION_CLICK, null, context, NotificationService::class.java)
-            intent.extras.putInt(Constants.COMPLICATION_ID, complicationId)
-            val pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-            intentRegistry[complicationId] = pendingIntent
+            intentRegistry[complicationId] = PendingIntent.getService(context, 0,
+                    Intent(Constants.ACTION_COMPLICATION_CLICK + complicationId, null, context, NotificationService::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
 
@@ -159,8 +159,9 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
      * This is called when the complication is deactivated.
      */
-    open fun deregister() {
+    open fun deregister(context: Context) {
         stateRegistry.remove(complicationId)
+        intentRegistry.remove(complicationId)
     }
 
     companion object: AnkoLogger {
