@@ -1,5 +1,5 @@
 /*
- * Stopwatch provider
+ * Timer provider
  * Copyright (C) 2016, Dan Wallach <dwallach@gmail.com>
  */
 
