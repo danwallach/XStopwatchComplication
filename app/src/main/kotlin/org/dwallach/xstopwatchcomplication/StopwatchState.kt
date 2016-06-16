@@ -94,10 +94,10 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
             builder.setLongText(complicationText)
     }
 
-    override val selectedIconID: Int
+    override val selectedIconId: Int
         get() = R.drawable.ic_stopwatch_selected
 
-    override val flatIconID: Int
+    override val flatIconId: Int
         get() = R.drawable.ic_stopwatch_flat
 
     override val type: String

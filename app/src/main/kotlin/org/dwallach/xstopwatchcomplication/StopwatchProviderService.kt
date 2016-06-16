@@ -5,6 +5,7 @@
 
 package org.dwallach.xstopwatchcomplication
 
+import android.app.PendingIntent
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.*
@@ -49,24 +50,31 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
             return
         }
 
+        val tapPendingIntent: PendingIntent? = SharedState[complicationId]?.tapComplicationPendingIntent
+
+        if(tapPendingIntent == null) {
+            error { "complicationId($complicationId) missing a tapPendingIntent!" }
+            return
+        }
+
         val data = when (complicationType) {
             ComplicationData.TYPE_ICON ->
                 ComplicationData.Builder(ComplicationData.TYPE_ICON)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .setTapAction(SharedState.getIntent(complicationId))
+                        .setTapAction(tapPendingIntent)
                         .build()
 
             ComplicationData.TYPE_SHORT_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .setTapAction(SharedState.getIntent(complicationId))
+                        .setTapAction(tapPendingIntent)
                         .styleStopwatchText(this, true, state)
                         .build()
 
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
-                        .setTapAction(SharedState.getIntent(complicationId))
+                        .setTapAction(tapPendingIntent)
                         .styleStopwatchText(this, false, state)
                         .build()
 

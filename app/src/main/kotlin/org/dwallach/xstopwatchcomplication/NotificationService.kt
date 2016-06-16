@@ -83,12 +83,29 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
             }
 
             // In this case, we're getting a click from the complication. Same encoding as above.
-            if(action.startsWith(Constants.ACTION_COMPLICATION_CLICK)) {
-                val complicationId = action.substring(Constants.ACTION_COMPLICATION_CLICK.length).toInt()
-                SharedState[complicationId]?.alarm(context)
+            if(action.startsWith(Constants.ACTION_COMPLICATION_TAP)) {
+                val complicationId = action.substring(Constants.ACTION_COMPLICATION_TAP.length).toInt()
+                SharedState[complicationId]?.click(context)
                 return
             }
 
+            if(action.startsWith(Constants.ACTION_CONFIGURE)) {
+                val complicationId = action.substring(Constants.ACTION_CONFIGURE.length).toInt()
+                SharedState[complicationId]?.configure(context)
+                return
+            }
+
+            if(action.startsWith(Constants.ACTION_PLAYPAUSE)) {
+                val complicationId = action.substring(Constants.ACTION_PLAYPAUSE.length).toInt()
+                SharedState[complicationId]?.playpause(context)
+                return
+            }
+
+            if(action.startsWith(Constants.ACTION_RESET)) {
+                val complicationId = action.substring(Constants.ACTION_RESET.length).toInt()
+                SharedState[complicationId]?.reset(context)
+                return
+            }
 
             throw InternalError("Undefined action: $action")
         }

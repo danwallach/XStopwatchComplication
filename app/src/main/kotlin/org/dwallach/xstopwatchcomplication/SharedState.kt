@@ -26,14 +26,17 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         protected set
     var isReset: Boolean
         protected set
+    var isNotificationShown: Boolean
+        protected set
 
     init {
         isRunning = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false) ?: false
         isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
+        isNotificationShown = false
     }
 
     open fun reset(context: Context) {
-        verbose { "${type} reset" }
+        verbose { "$type($complicationId) reset" }
         isRunning = false
         isReset = true
 
@@ -41,14 +44,19 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
     }
 
     open fun alarm(context: Context) {
-        verbose { "${type} alarm!" }
+        verbose { "$type($complicationId) alarm!" }
         // the timer will do more with this; it's meaningless for the stopwatch
 
         forceUpdate(context)
     }
 
+    open fun configure(context: Context) {
+        verbose { "$type($complicationId) configure" }
+        // the timer will do more with this; it's meaningless for the stopwatch
+    }
+
     open fun run(context: Context) {
-        verbose { "${type} run" }
+        verbose { "$type($complicationId) run" }
 
         isReset = false
         isRunning = true
@@ -58,7 +66,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
     }
 
     open fun pause(context: Context) {
-        verbose { "${type} pause" }
+        verbose { "$type($complicationId) pause" }
 
         isRunning = false
 
@@ -66,12 +74,14 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
     }
 
     fun click(context: Context) {
-        verbose { "${type} click" }
-        if (isRunning)
-            pause(context)
-        else
-            run(context)
+        verbose { "$type($complicationId) click" }
+
+
+        // TODO launch the notification for this particular complication
+        // TODO tear down notifications for any other complications
     }
+
+    fun playpause(context: Context) = if (isRunning) pause(context) else run(context)
 
     /**
      * Return the time of either when the stopwatch began or when the countdown ends.
@@ -115,26 +125,42 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
 
     override fun toString() = relativeTimeString(eventTime())
 
-    abstract val flatIconID: Int
+    abstract val flatIconId: Int
 
-    abstract val selectedIconID: Int
+    abstract val selectedIconId: Int
 
     abstract val shortName: String
 
+    var tapComplicationPendingIntent: PendingIntent? = null
+        protected set
+    var clickPlayPausePendingIntent: PendingIntent? = null
+        protected set
+    var clickResetPendingIntent: PendingIntent? = null
+        protected set
+    var clickConfigurePendingIntent: PendingIntent? = null
+        protected set
+
     /**
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
-     * This is called when the complication is activated.
+     * This is initialized when the complication is activated.
      */
     open fun register(context: Context) {
         stateRegistry[complicationId] = this
 
-        // we only ever have to do this once, regardless of registration and deregistration
+        tapComplicationPendingIntent = PendingIntent.getService(context, 0,
+                Intent(Constants.ACTION_COMPLICATION_TAP + complicationId, null, context, NotificationService::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT)
 
-        if(intentRegistry[complicationId] == null) {
-            intentRegistry[complicationId] = PendingIntent.getService(context, 0,
-                    Intent(Constants.ACTION_COMPLICATION_CLICK + complicationId, null, context, NotificationService::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT)
-        }
+        clickPlayPausePendingIntent = PendingIntent.getService(context, 0,
+                Intent(Constants.ACTION_PLAYPAUSE + complicationId, null, context, NotificationService::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT)
+
+        clickResetPendingIntent = PendingIntent.getService(context, 0,
+                Intent(Constants.ACTION_RESET + complicationId, null, context, NotificationService::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // we're not initializing the clickConfigurePendingIntent here, since that's only used
+        // for the timer
     }
 
     /**
@@ -143,7 +169,18 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
      */
     open fun deregister(context: Context) {
         stateRegistry.remove(complicationId)
-        intentRegistry.remove(complicationId)
+
+        clickPlayPausePendingIntent?.cancel()
+        clickPlayPausePendingIntent = null
+
+        clickResetPendingIntent?.cancel()
+        clickResetPendingIntent = null
+
+        clickConfigurePendingIntent?.cancel()
+        clickConfigurePendingIntent = null
+
+        tapComplicationPendingIntent?.cancel()
+        tapComplicationPendingIntent = null
     }
 
     /**
@@ -155,8 +192,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
     abstract val componentName: ComponentName
 
     companion object: AnkoLogger {
-        private val stateRegistry: MutableMap<Int,SharedState> = HashMap()
-        private val intentRegistry: MutableMap<Int,PendingIntent> = HashMap()
+        protected val stateRegistry: MutableMap<Int,SharedState> = HashMap()
         private var restoreNecessary: Boolean = true // starts off true, set false once we've restored
 
         fun currentTime() = System.currentTimeMillis()
@@ -166,12 +202,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
          * if there is no such complication.
          */
         operator fun get(complicationId: Int) = stateRegistry[complicationId]
-
-        /**
-         * Fetch the pending intent for a given complication. Results might be null
-         * if there is no such complication.
-         */
-        fun getIntent(complicationId: Int) = intentRegistry[complicationId]
 
         /**
          * Returns a set of all IDs currently known to be active.

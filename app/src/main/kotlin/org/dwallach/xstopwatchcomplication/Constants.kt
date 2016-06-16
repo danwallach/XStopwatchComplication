@@ -10,7 +10,10 @@ object Constants {
     const val PREFIX = "org.dwallach.xstopwatchcomplication"
     const val PREFERENCES = "$PREFIX.prefs"
     const val ACTION_TIMER_COMPLETE = "$PREFIX.timer.ACTION_TIMER_COMPLETE"
-    const val ACTION_COMPLICATION_CLICK = "$PREFIX.CLICK"
+    const val ACTION_COMPLICATION_TAP = "$PREFIX.TAP"
+    const val ACTION_PLAYPAUSE = "$PREFIX.PLAYPAUSE"
+    const val ACTION_RESET = "$PREFIX.RESET"
+    const val ACTION_CONFIGURE = "$PREFIX.CONFIGURE"
     const val COMPLICATION_ID = "complicationId"
     const val PREFERENCES_VERSION = 1
 

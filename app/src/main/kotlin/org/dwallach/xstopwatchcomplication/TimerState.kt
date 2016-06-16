@@ -152,9 +152,25 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     override fun deregister(context: Context) {
         verbose("deregister")
+        super.deregister(context)
         context.alarmManager.cancel(getPendingIntent(context))
         pendingIntentCache = null
     }
+
+    override fun register(context: Context) {
+        verbose("register")
+        super.register(context)
+
+        clickConfigurePendingIntent =
+//                PendingIntent.getService(context, 0,
+//                        Intent(Constants.ACTION_CONFIGURE + complicationId, null, context, NotificationService::class.java),
+//                        PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // TODO: replace null with a reference to a time picker activity
+            PendingIntent.getActivity(context, 1, Intent(context, null /* activity */), 0)
+
+    }
+
 
     private fun timerDiffText(completionTime: Long): ComplicationText =
             ComplicationText.TimeDifferenceBuilder()
@@ -185,10 +201,10 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     }
 
 
-    override val flatIconID: Int
+    override val flatIconId: Int
         get() = R.drawable.ic_sandwatch_flat
 
-    override val selectedIconID: Int
+    override val selectedIconId: Int
         get() = R.drawable.ic_sandwatch_selected
 
     override val type: String
