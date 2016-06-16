@@ -6,6 +6,7 @@
  */
 package org.dwallach.xstopwatchcomplication
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
@@ -104,6 +105,9 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
 
     override val shortName: String
         get() = "[Stopwatch] "
+
+    override val componentName: ComponentName
+        get() = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderState")
 }
 
 /**

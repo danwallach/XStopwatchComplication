@@ -1,6 +1,6 @@
 Finish stopwatch
     DONE? register for clicks from the watchface
-    TODO make the watchface to get an update from us when our state changes
+    DONE? make the watchface to get an update from us when our state changes
 
     Notification / activity / menu choices
         TODO "MediaStyle" notification with buttons (actions -> pending intents -> our notification service)
@@ -17,7 +17,7 @@ Finish stopwatch
 
 Add timer support
     DONE? port over the StopwatchState to fit the new world order
-    TODO make the watchface to get an update from us when our state changes
+    DONE? make the watchface to get an update from us when our state changes
     TODO time picker fragment
     TODO verify whether Wear 2.0 has a time picker that actually works
     TODO yet another notification / activity / menu choices

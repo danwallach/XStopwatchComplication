@@ -15,10 +15,4 @@ import android.support.wearable.complications.ProviderUpdateRequester
  */
 fun String.toComplicationText() = ComplicationText.plainText(this)
 
-/**
- * Forces the watchface to request an update to the complication
- */
-fun ComplicationProviderService.forceUpdate(context: Context, name: ComponentName, complicationID: Int) {
-    val updater = ProviderUpdateRequester(context, name)
-    updater.requestUpdate(complicationID)
-}
+

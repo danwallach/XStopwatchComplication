@@ -5,7 +5,6 @@
 
 package org.dwallach.xstopwatchcomplication
 
-import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.*
@@ -38,7 +37,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      *       ProviderUpdateRequester.requestUpdate() method.
      */
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug("onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)");
+        debug { "onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)" }
 
         val state = SharedState[complicationId]
         if(state == null) {
@@ -106,11 +105,5 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         super.onDestroy()
         // we're only doing this so we can log when we get destroyed, which will help us debug things
         verbose("onDestroy")
-    }
-
-
-    companion object {
-        // this is necessary for notifying the watchface that it needs to talk back to us
-        val componentName = ComponentName.createRelative(".", "StopwatchProviderService")
     }
 }

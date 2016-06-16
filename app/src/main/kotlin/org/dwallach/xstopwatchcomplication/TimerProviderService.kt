@@ -19,7 +19,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
      * is called.
      */
     override fun onComplicationActivated(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationActivated(): complicationId($complicationId), complicationType($complicationType)" }
+        debug { "onComplicationActivated: complicationId($complicationId), complicationType($complicationType)" }
         super.onComplicationActivated(complicationId, complicationType, complicationManager);
 
         TimerState(complicationId).register(this) // create state for the complication and save it away
@@ -37,7 +37,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
      *       ProviderUpdateRequester.requestUpdate() method.
      */
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug("onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)");
+        debug { "onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)" }
 
         val state = SharedState[complicationId]
         if(state == null) {
@@ -107,10 +107,4 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
         // we're only doing this so we can log when we get destroyed, which will help us debug things
         verbose("onDestroy")
     }
-
-
-//    companion object {
-        // this might be necessary later for notifying the watchface that it needs to talk back to us
-//        val componentName = ComponentName.createRelative(".", "TimerProviderService")
-//    }
 }

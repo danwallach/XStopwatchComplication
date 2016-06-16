@@ -9,7 +9,6 @@ package org.dwallach.xstopwatchcomplication
 import android.app.IntentService
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 
 import org.jetbrains.anko.*
 

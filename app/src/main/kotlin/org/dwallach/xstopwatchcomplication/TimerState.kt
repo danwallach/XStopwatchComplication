@@ -8,6 +8,7 @@ package org.dwallach.xstopwatchcomplication
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -94,7 +95,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         val vibratorPattern = longArrayOf(100, 200, 100, 200, 100, 200, 100, 200)
         verbose("buzzing!")
 
-        reset(context) // timer state, also resets the alarm
+        reset(context) // timer state, also resets the alarm and does a forceUpdate()
         saveEverything(context)
 
         context.vibrator.vibrate(vibratorPattern, -1, AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
@@ -195,6 +196,9 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     override val shortName: String
         get() = "[Timer] "
+
+    override val componentName: ComponentName
+        get() = ComponentName.createRelative(Constants.PREFIX, ".TimerProviderService")
 }
 
 /**

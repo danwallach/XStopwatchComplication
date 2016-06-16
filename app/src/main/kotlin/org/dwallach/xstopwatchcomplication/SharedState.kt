@@ -32,37 +32,19 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
     }
 
-    /**
-     * This sends a message to the watchface to request new complication data from us. Totally
-     * roundabout, but it's the proper way of doing things.
-     */
-    private fun pushUpdate(context: Context) {
-        val name: ComponentName? = when(type) {
-            Constants.TYPE_STOPWATCH -> StopwatchProviderService.componentName
-            Constants.TYPE_TIMER -> null // TODO Timer!
-            else -> null
-        }
-
-        if(name == null) {
-            error("no ComponentName, cannot push updates!")
-        } else {
-            ProviderUpdateRequester(context, name).requestUpdate(complicationId)
-        }
-    }
-
     open fun reset(context: Context) {
         verbose { "${type} reset" }
         isRunning = false
         isReset = true
 
-        pushUpdate(context)
+        forceUpdate(context)
     }
 
     open fun alarm(context: Context) {
         verbose { "${type} alarm!" }
         // the timer will do more with this; it's meaningless for the stopwatch
 
-        pushUpdate(context)
+        forceUpdate(context)
     }
 
     open fun run(context: Context) {
@@ -72,7 +54,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         isRunning = true
 
 
-        pushUpdate(context)
+        forceUpdate(context)
     }
 
     open fun pause(context: Context) {
@@ -80,7 +62,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
 
         isRunning = false
 
-        pushUpdate(context)
+        forceUpdate(context)
     }
 
     fun click(context: Context) {
@@ -163,6 +145,14 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         stateRegistry.remove(complicationId)
         intentRegistry.remove(complicationId)
     }
+
+    /**
+     * Forces the watchface to request an update to the complication
+     */
+    fun forceUpdate(context: Context) =
+        ProviderUpdateRequester(context, componentName).requestUpdate(complicationId)
+
+    abstract val componentName: ComponentName
 
     companion object: AnkoLogger {
         private val stateRegistry: MutableMap<Int,SharedState> = HashMap()
