@@ -50,7 +50,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
             return
         }
 
-        val tapPendingIntent: PendingIntent? = SharedState[complicationId]?.tapComplicationPendingIntent
+        val tapPendingIntent: PendingIntent? = state.tapComplicationPendingIntent
 
         if(tapPendingIntent == null) {
             error { "complicationId($complicationId) missing a tapPendingIntent!" }
