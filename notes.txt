@@ -3,13 +3,13 @@ Finish stopwatch
     DONE? make the watchface to get an update from us when our state changes
 
     Notification / activity / menu choices
-        TODO "MediaStyle" notification with buttons (actions -> pending intents -> our notification service)
-        TODO Use of chronometer feature
+        DONE? "MediaStyle" notification with buttons (actions -> pending intents -> our notification service)
+        DONE? Use of chronometer feature
         Further details, Google IO video:
         https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
 
 	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications)
-	TODO setColor for tinting (different for stopwatch / timer)
+	TODO setColor for tinting (different for stopwatch / timer) - replace "setBackground"
 	DONE? Add BroadcastReceiver for boot-completed and results from pending intents
 	TODO manifest.xml with all the trimmings
 
@@ -22,7 +22,7 @@ Add timer support
     DONE? make the watchface to get an update from us when our state changes
     TODO time picker fragment
     TODO verify whether Wear 2.0 has a time picker that actually works
-    TODO yet another notification / activity / menu choices
+    DONE? yet another notification / activity / menu choices
     DONE? figure out how to set an alarm
     DONE? make sure we can kill alarms when a complication is deregistered
 

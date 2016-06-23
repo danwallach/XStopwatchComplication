@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Icon
 import org.jetbrains.anko.*
 
 class NotificationHelper(private val context: Context, private val title: String, private val state: SharedState): AnkoLogger {
@@ -23,7 +24,7 @@ class NotificationHelper(private val context: Context, private val title: String
 
     }
 
-    fun notify(eventTime: Long, isRunning: Boolean) {
+    fun notify(eventTime: Long) {
         // Google docs for this:
         // http://developer.android.com/training/notify-user/build-notification.html
 
@@ -35,27 +36,48 @@ class NotificationHelper(private val context: Context, private val title: String
 
         val bg = BitmapFactory.decodeResource(context.resources, iconId)
 
-        // TODO add media button goodies
-        val notification = Notification.Builder(context).apply {
-            if(!isRunning)
-                addAction(context, android.R.drawable.ic_media_play, "", state.clickPlayPausePendingIntent)
-                        .setContentTitle(state.toString())
-                        .setContentText(title) // deliberately backwards for these two so the peek card has the important stuff above the fold
-            else
-                addAction(context, android.R.drawable.ic_media_pause, "", state.clickPlayPausePendingIntent)
-                        .setWhen(eventTime)
-                        .setUsesChronometer(true)
-                        .setShowWhen(true)
+        if (state.clickResetPendingIntent == null) {
+            error { "No clickResetPendingIntent" }
+            return
         }
-                .setOngoing(true)
-                .setLocalOnly(true)
-                .setSmallIcon(iconId)
-//                .addAction(context, iconId, title, launchPendingIntent)
-                .extend(Notification.WearableExtender()
-                        .setHintHideIcon(true)
-                        .setContentAction(0)
-                        .setBackground(bg))
-                .build()
+
+        if (state.clickPlayPausePendingIntent == null) {
+            error { "No clickPlayPausePendingIntent" }
+            return
+        }
+
+        val notification = Notification.Builder(context).apply {
+            addAction(context, android.R.drawable.ic_menu_close_clear_cancel, "", state.clickResetPendingIntent)
+
+            addAction(context, android.R.drawable.ic_menu_edit, "", state.clickConfigurePendingIntent)
+
+            if (!state.isRunning) {
+                addAction(context, android.R.drawable.ic_media_play, "", state.clickPlayPausePendingIntent)
+                setContentTitle(state.toString())
+                setContentText(title) // deliberately backwards for these two so the peek card has the important stuff above the fold
+            } else {
+                addAction(context, android.R.drawable.ic_media_pause, "", state.clickPlayPausePendingIntent)
+                setWhen(eventTime)
+                setUsesChronometer(true)
+                setShowWhen(true)
+            }
+
+            // we want the media buttons to appear in our tiny notification, so here we're saying that
+            // we do indeed want all of them
+            if (state.clickConfigurePendingIntent != null)
+                setStyle(Notification.MediaStyle().setShowActionsInCompactView(0, 1, 2))
+            else
+                setStyle(Notification.MediaStyle().setShowActionsInCompactView(0, 1))
+
+            setOngoing(true)
+            setLocalOnly(true)
+            setSmallIcon(iconId)
+
+            extend(Notification.WearableExtender()
+                    .setHintHideIcon(true)
+                    .setContentAction(0)
+                    .setBackground(bg))
+        }.build()
 
         // launch the notification
         context.notificationManager.notify(notificationId, notification)
@@ -64,21 +86,14 @@ class NotificationHelper(private val context: Context, private val title: String
 
 /**
  * The addAction builder that we want to use has been deprecated, "because reasons", so this brings
- * it back for us. Let's hear it for Kotlin extension methods!
+ * it back for us. Let's hear it for Kotlin extension methods! Note that if the intent is null, this
+ * will quietly be a no-op rather than indicating any sort of error.
  */
 fun Notification.Builder.addAction(context: Context, iconId: Int, title: String, intent: PendingIntent?): Notification.Builder =
+        // Helpful: http://stackoverflow.com/questions/35647821/android-notification-addaction-deprecated-in-api-23
+        // I tried doing this with NotificationCompat, and it never quite worked. Something or other
+        // always came out missing.
         if(intent == null)
             this
         else
-            // TODO replace with NotificationCompat to avoid this whole deprecation issue
-            this.addAction(iconId, title, intent)
-
-// The above call to addAction is deprecated. Below is my attempt to solve this, but it turns out to crash
-// in a funny way, saying it can't find Icon.createWithResources at runtime. Weird. We'll just leave this
-// here for now, and sort this out later if/when the deprecated method finally dies and we're forced to deal
-// with it. For now, "if it ain't broke, don't fix it."
-
-//        this.addAction(
-//                Notification.Action.Builder(
-//                        Icon.createWithResource(context, iconId),
-//                        title, intent) .build() )
+            this.addAction(Notification.Action.Builder(Icon.createWithResource(context, iconId), title, intent).build())
