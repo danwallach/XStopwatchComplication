@@ -11,9 +11,10 @@ Finish stopwatch
 	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications)
 	TODO setColor for tinting (different for stopwatch / timer) - replace "setBackground"
 	DONE? Add BroadcastReceiver for boot-completed and results from pending intents
-	TODO manifest.xml with all the trimmings
+	DONE? manifest.xml with all the trimmings
 
-	TODO set desired order of complications (small, big, icon-only, etc.)
+	DONE? set desired order of complications (small, big, icon-only, etc.)
+	  -- this seems to come from the watchface, not from us, so nothing to do for now
 
 	TODO "Ok Google, start stopwatch" -- requires an activity?
 
