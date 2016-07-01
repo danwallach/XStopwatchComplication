@@ -1,7 +1,7 @@
 apply plugin: 'idea'
 
 buildscript {
-    ext.kotlin_version = '1.0.3-eap-58'
+    ext.kotlin_version = '1.0.3'
     ext.anko_version = '0.9'
 
     repositories {
