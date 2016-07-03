@@ -53,7 +53,7 @@ class NotificationHelper(private val state: SharedState): AnkoLogger {
 
             if (!state.isRunning) {
                 addAction(context, android.R.drawable.ic_media_play, "", state.clickPlayPausePendingIntent)
-                setContentTitle(state.relativeTimeString())
+                setContentTitle(state.displayTime())
                 setContentText(title) // deliberately backwards for these two so the peek card has the important stuff above the fold
             } else {
                 addAction(context, android.R.drawable.ic_media_pause, "", state.clickPlayPausePendingIntent)

@@ -26,7 +26,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected set
     var isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
         protected set
-    val notificationHelper = NotificationHelper(this)
+    var notificationHelper: NotificationHelper? = null
 
     open fun reset(context: Context) {
         verbose { "$type($complicationId) reset" }
@@ -83,9 +83,19 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * notification cards for any other stopwatch/timer notifications.
      */
     fun notify(context: Context) {
-        activeStates().forEach { if(it != this) it.notificationHelper.kill(context) }
-        notificationHelper.notify(context, eventTime())
-        verbose { "Notification for: ${toString()}"}
+        if(notificationHelper == null) {
+            // a different complication has it -- kill!
+            activeStates().forEach {
+                if(it.notificationHelper != null) {
+                    it.notificationHelper?.kill(context)
+                    it.notificationHelper = null
+                }
+            }
+            notificationHelper = NotificationHelper(this)
+        }
+        // at this point, we own the notificationHelper, but Kotlin doesn't believe it
+        verbose { "Posting notification: ${toString()}"}
+        notificationHelper?.notify(context, eventTime())
     }
 
     /**
@@ -175,6 +185,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * This is called when the complication is deactivated.
      */
     open fun deregister(context: Context) {
+        notificationHelper?.kill(context)
         stateRegistry.remove(complicationId)
 
         clickPlayPausePendingIntent?.cancel()

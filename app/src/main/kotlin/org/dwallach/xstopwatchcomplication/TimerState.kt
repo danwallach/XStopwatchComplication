@@ -116,8 +116,10 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
                 verbose { "alarm in the past, not setting" }
             }
         } else {
+            // note that we're only killing off the alarm; we're not killing off everything else
+
             verbose("removing alarm")
-            deregister(context)
+            deregisterTimerCompleteAlarm(context)
         }
     }
 
@@ -145,11 +147,15 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, wakeupTime, getPendingIntent(context))
     }
 
+    private fun deregisterTimerCompleteAlarm(context: Context) {
+        context.alarmManager.cancel(getPendingIntent(context))
+        pendingIntentCache = null
+    }
+
     override fun deregister(context: Context) {
         verbose("deregister")
         super.deregister(context)
-        context.alarmManager.cancel(getPendingIntent(context))
-        pendingIntentCache = null
+        deregisterTimerCompleteAlarm(context)
     }
 
     override fun register(context: Context) {
