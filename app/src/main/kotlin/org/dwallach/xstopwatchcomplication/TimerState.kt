@@ -22,26 +22,21 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     /**
      * if the timer's not running, this says how far we got (i.e., we're at startTime + elapsedTime, and 0 <= elapsedTime <= duration)
      */
-    var elapsedTime: Long = 0
+    var elapsedTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_ELAPSED_TIME}", 0) ?: 0
         private set
 
     /**
      * when the timer started running
      */
-    var startTime: Long = 0
+    var startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
         private set
 
     /**
      * when the timer ends (i.e., the timer completes at startTime + duration, assuming it's running). Default: one minute (60,000 sec)
      */
-    var duration: Long = Constants.TIMER_DEFAULT_VALUE // one minute
+    var duration = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_DURATION}", Constants.TIMER_DEFAULT_VALUE)
+            ?: Constants.TIMER_DEFAULT_VALUE
         private set
-
-    init {
-        elapsedTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_ELAPSED_TIME}", 0) ?: 0
-        startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
-        duration = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_DURATION}", Constants.TIMER_DEFAULT_VALUE) ?: Constants.TIMER_DEFAULT_VALUE
-    }
 
     override fun saveState(editor: SharedPreferences.Editor) {
         super.saveState(editor)
@@ -215,6 +210,8 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     override val componentName: ComponentName
         get() = ComponentName.createRelative(Constants.PREFIX, ".TimerProviderService")
+
+    override fun toString(): String = "${super.toString()} elapsedTime($elapsedTime), startTime($startTime), duration($duration)"
 }
 
 /**

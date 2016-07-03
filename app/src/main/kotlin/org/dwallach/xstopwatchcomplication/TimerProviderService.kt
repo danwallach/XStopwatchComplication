@@ -21,7 +21,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
      */
     override fun onComplicationActivated(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
         debug { "onComplicationActivated: complicationId($complicationId), complicationType($complicationType)" }
-        super.onComplicationActivated(complicationId, complicationType, complicationManager);
+        super.onComplicationActivated(complicationId, complicationType, complicationManager)
 
         TimerState(complicationId).register(this) // create state for the complication and save it away
         SharedState.saveEverything(this)
@@ -86,7 +86,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
         }
 
         if (data != null) {
-            complicationManager.updateComplicationData(complicationId, data);
+            complicationManager.updateComplicationData(complicationId, data)
         }
     }
 
@@ -96,7 +96,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
      */
     override fun onComplicationDeactivated(complicationId: Int) {
         debug { "onComplicationDeactivated: $complicationId" }
-        super.onComplicationDeactivated(complicationId);
+        super.onComplicationDeactivated(complicationId)
 
         SharedState[complicationId]?.deregister(this)
         SharedState.saveEverything(this)

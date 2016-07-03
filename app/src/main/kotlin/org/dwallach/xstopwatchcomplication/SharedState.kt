@@ -21,25 +21,19 @@ import java.util.*
 /**
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
-abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = null): AnkoLogger {
-    var isRunning: Boolean
+abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): AnkoLogger {
+    var isRunning = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false) ?: false
         protected set
-    var isReset: Boolean
+    var isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
         protected set
-    var isNotificationShown: Boolean
-        protected set
-
-    init {
-        isRunning = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false) ?: false
-        isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
-        isNotificationShown = false
-    }
+    val notificationHelper = NotificationHelper(this)
 
     open fun reset(context: Context) {
         verbose { "$type($complicationId) reset" }
         isRunning = false
         isReset = true
 
+        notify(context)
         forceUpdate(context)
     }
 
@@ -47,6 +41,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         verbose { "$type($complicationId) alarm!" }
         // the timer will do more with this; it's meaningless for the stopwatch
 
+        notify(context)
         forceUpdate(context)
     }
 
@@ -62,6 +57,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
         isRunning = true
 
 
+        notify(context)
         forceUpdate(context)
     }
 
@@ -70,18 +66,27 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
 
         isRunning = false
 
+        notify(context)
         forceUpdate(context)
     }
 
     fun click(context: Context) {
         verbose { "$type($complicationId) click" }
 
-
-        // TODO launch the notification for this particular complication
-        // TODO tear down notifications for any other complications
+        notify(context)
     }
 
     fun playpause(context: Context) = if (isRunning) pause(context) else run(context)
+
+    /**
+     * Pops up a notification card for this complication and kills off any other
+     * notification cards for any other stopwatch/timer notifications.
+     */
+    fun notify(context: Context) {
+        activeStates().forEach { if(it != this) it.notificationHelper.kill(context) }
+        notificationHelper.notify(context, eventTime())
+        verbose { "Notification for: ${toString()}"}
+    }
 
     /**
      * Return the time of either when the stopwatch began or when the countdown ends.
@@ -114,16 +119,18 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
 
     /**
      * This converts an absolute time, as returned by eventTime, to a relative time
-     * that might be displayed
+     * that might be displayed. This works whether the eventTime is before or after
+     * the currentTime, making it useful for both timers and stopwatches.
      */
-    fun relativeTimeString(eventTime: Long): String =
-            DateUtils.formatElapsedTime(
-                    if (isRunning)
-                        Math.abs(currentTime() - eventTime) / 1000
-                    else
-                        Math.abs(eventTime) / 1000)
+    fun displayTime(): String = DateUtils.formatElapsedTime(Math.abs(
+            if (isRunning)
+                currentTime() - eventTime() / 1000
+            else
+                eventTime() / 1000))
 
-    override fun toString() = relativeTimeString(eventTime())
+
+
+    override fun toString() = "$shortName[$complicationId]: running($isRunning), reset($isReset), display(${displayTime()})"
 
     abstract val flatIconId: Int
 
@@ -207,6 +214,11 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences? = 
          * Returns a set of all IDs currently known to be active.
          */
         fun activeIds() = stateRegistry.keys
+
+        /**
+         * Returns a set of all SharedStates currently known to be active.
+         */
+        fun activeStates() = stateRegistry.values
 
         fun saveEverything(context: Context) {
             verbose("saveEverything")

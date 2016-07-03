@@ -7,12 +7,12 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import org.jetbrains.anko.*
 
-class NotificationHelper(private val context: Context, private val title: String, private val state: SharedState): AnkoLogger {
-
+class NotificationHelper(private val state: SharedState): AnkoLogger {
     private val notificationId = state.complicationId
     private val iconId = state.flatIconId
+    private val title = state.shortName
 
-    fun kill() {
+    fun kill(context: Context) {
         verbose { "nuking notification #$notificationId" }
 
         try {
@@ -24,7 +24,7 @@ class NotificationHelper(private val context: Context, private val title: String
 
     }
 
-    fun notify(eventTime: Long) {
+    fun notify(context: Context, eventTime: Long) {
         // Google docs for this:
         // http://developer.android.com/training/notify-user/build-notification.html
 
@@ -53,7 +53,7 @@ class NotificationHelper(private val context: Context, private val title: String
 
             if (!state.isRunning) {
                 addAction(context, android.R.drawable.ic_media_play, "", state.clickPlayPausePendingIntent)
-                setContentTitle(state.toString())
+                setContentTitle(state.relativeTimeString())
                 setContentText(title) // deliberately backwards for these two so the peek card has the important stuff above the fold
             } else {
                 addAction(context, android.R.drawable.ic_media_pause, "", state.clickPlayPausePendingIntent)

@@ -17,19 +17,14 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
-    var priorTime: Long = 0
+    var priorTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0) ?: 0
         private set
 
     /**
      * When the stopwatch started running
      */
-    var startTime: Long = 0
+    var startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
         private set
-
-    init {
-        priorTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0) ?: 0
-        startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
-    }
 
     override fun saveState(editor: SharedPreferences.Editor) {
         super.saveState(editor)
@@ -108,6 +103,8 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
 
     override val componentName: ComponentName
         get() = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderState")
+
+    override fun toString(): String = "${super.toString()} priorTime($priorTime), startTime($startTime)"
 }
 
 /**
