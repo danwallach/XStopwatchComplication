@@ -51,8 +51,11 @@ android {
     buildToolsVersion '24.0.0'
     defaultConfig {
         applicationId "org.dwallach.xstopwatchcomplication"
-        minSdkVersion 24
-        targetSdkVersion 24
+        // these are currently 'N', which is an artifact of the weird roll-out of the Wear 2.0 Preview
+        // but these will both be 24 once things stabilize. We don't intend this app to run on anything
+        // earlier than Wear 2.0.
+        minSdkVersion 'N'
+        targetSdkVersion 'N'
         versionCode getVersionCode()
         versionName getVersionName()
     }
@@ -70,7 +73,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:2.0.0-alpha1'
-    compile 'com.google.android.gms:play-services-wearable:9.0.2'
+    compile 'com.google.android.gms:play-services-wearable:9.2.0'
 
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'

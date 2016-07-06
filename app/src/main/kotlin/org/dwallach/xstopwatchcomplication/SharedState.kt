@@ -257,7 +257,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).apply {
                 val version = getInt(Constants.PREFERENCES+".version", 1)
-                val activeIds = getString(Constants.PREFERENCES+".activeIds", "").split(",").map { it.toInt() }
+                val activeIds = getString(Constants.PREFERENCES+".activeIds", "")
+                        .split(",") // if we get back the empty-string, as default above, then this returns a list with one element: the empty string
+                        .filter { it.length > 0 } // so here we filter out any zero-length strings
+                        .map { it.toInt() }
 
                 verbose("restoreEverything: version($version), activeIds(${activeIds.joinToString(",")}")
 
