@@ -38,7 +38,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
      *       ProviderUpdateRequester.requestUpdate() method.
      */
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)" }
+        debug { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
 
         val state = SharedState[complicationId]
         if(state == null) {
@@ -66,7 +66,7 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
                         .build()
 
             ComplicationData.TYPE_SHORT_TEXT ->
-                ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
+                ComplicationData.Builder(ComplicationData.TYPE_SHORT_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_sandwatch_flat))
                         .setTapAction(tapPendingIntent)
                         .styleTimerText(this, true, state)

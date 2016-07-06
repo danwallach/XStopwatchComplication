@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">XStopwatchComplication</string>
-    <string name="stopwatch_provider">XStopwatch</string>
-    <string name="timer_provider">XTimer</string>
+    <string name="app_name">X-Complications</string>
+    <string name="stopwatch_provider">Stopwatch</string>
+    <string name="timer_provider">Timer</string>
 </resources>

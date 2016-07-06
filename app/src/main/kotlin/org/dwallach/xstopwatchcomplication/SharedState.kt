@@ -19,14 +19,50 @@ import org.jetbrains.anko.verbose
 import java.util.*
 
 /**
+ * Useful helpers. Let us avoid repeating ourselves later on when we might have a
+ * null SharedPreferences reference.
+ */
+fun SharedPreferences?.getBoolean(s: String, default: Boolean): Boolean =
+        if(this == null) default else getBoolean(s, default)
+
+fun SharedPreferences?.getLong(s: String, default: Long): Long =
+        if(this == null) default else getLong(s, default)
+
+/**
+ * Turns out that "".split(whatever) yields a list with one element, when we'd
+ * rather it be an empty list. Also, what if the list is null? This extension
+ * function does the right thing.
+ */
+fun String?.safeSplit(separator: String): List<String> =
+    if(this == null || this == "") emptyList() else split(separator)
+
+/**
+ * Shorthand to make our lives a bit easier
+ */
+fun currentTime() = System.currentTimeMillis()
+
+/**
+ * This converts an absolute time, as returned by eventTime, to a relative time
+ * that might then be displayed. We'll use this locally, but watchfaces will
+ * use the complication text thing, with its own built-in formatter.
+ */
+fun relativeTimeString(eventTime: Long, isRunning: Boolean = false): String =
+        DateUtils.formatElapsedTime(
+                if (isRunning)
+                    Math.abs(currentTime() - eventTime) / 1000
+                else
+                    Math.abs(eventTime) / 1000)
+
+/**
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
 abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): AnkoLogger {
-    var isRunning = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false) ?: false
+    var isRunning = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false)
         protected set
-    var isReset = prefs?.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true) ?: true
+    var isReset = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
         protected set
     var notificationHelper: NotificationHelper? = null
+
 
     open fun reset(context: Context) {
         verbose { "$type($complicationId) reset" }
@@ -216,6 +252,14 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         fun currentTime() = System.currentTimeMillis()
 
         /**
+         * What's the right way to represent the time when we've reset the stopwatch or timer?
+         * Eventually, this should go through the ComplicationText libraries, but that seems to
+         * grenade right now, so we'll do this instead.
+         */
+        var zeroResetString: String = DateUtils.formatElapsedTime(0)
+          private set
+
+        /**
          * Fetch the shared state for a given complication. Results might be null
          * if there is no such complication.
          */
@@ -258,8 +302,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).apply {
                 val version = getInt(Constants.PREFERENCES+".version", 1)
                 val activeIds = getString(Constants.PREFERENCES+".activeIds", "")
-                        .split(",") // if we get back the empty-string, as default above, then this returns a list with one element: the empty string
-                        .filter { it.length > 0 } // so here we filter out any zero-length strings
+                        .safeSplit(",")
                         .map { it.toInt() }
 
                 verbose("restoreEverything: version($version), activeIds(${activeIds.joinToString(",")}")

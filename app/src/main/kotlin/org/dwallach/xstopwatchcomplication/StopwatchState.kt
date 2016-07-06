@@ -17,13 +17,13 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     /**
      * extra time to add in (accounting for prior pause/restart cycles) -- analogous to the "base" time in android.widget.Chronometer
      */
-    var priorTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0) ?: 0
+    var priorTime = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_PRIOR_TIME}", 0)
         private set
 
     /**
      * When the stopwatch started running
      */
-    var startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
+    var startTime = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0)
         private set
 
     override fun saveState(editor: SharedPreferences.Editor) {
@@ -63,25 +63,40 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
             priorTime
         }
 
-    private fun stopwatchDiffText(start: Long): ComplicationText =
-            ComplicationText.TimeDifferenceBuilder()
-                    .setReferencePeriodEnd(start)
-                    .setStyle(ComplicationText.DIFFERENCE_STYLE_STOPWATCH)
-                    .build()
+    private fun stopwatchDiffText(start: Long): ComplicationText {
+        verbose { "Computing stopwatchDiffText(${start}) -> ${relativeTimeString(start)}" }
+        return ComplicationText.TimeDifferenceBuilder()
+                .setReferencePeriodEnd(start)
+                .setStyle(ComplicationText.DIFFERENCE_STYLE_STOPWATCH)
+                .build()
+    }
 
 
     override fun styleComplicationBuilder(context: Context, small: Boolean, builder: ComplicationData.Builder) {
-        if(isReset) return // we'll set no styles when the stopwatch is zeroed
-
-        val complicationText = when {
-            isRunning -> stopwatchDiffText(startTime - priorTime)
+        val complicationText: ComplicationText = when {
+            isRunning -> {
+                verbose("Stopwatch running")
+                stopwatchDiffText(startTime - priorTime)
+            }
 
         // complicated way of finding out how to represent "0"
-//            isReset -> stopwatchDiffText(startTime).getText(context, startTime).toString().toComplicationText()
+            isReset -> {
+                verbose("Stopwatch is reset")
+                // TODO: figure out why the code below bombs
+//                stopwatchDiffText(startTime).getText(context, startTime).toString().toComplicationText()
+                relativeTimeString(0).toComplicationText()
+            }
 
         // complicated way of finding how how to represent the time when the user hit "pause"
-            else -> stopwatchDiffText(startTime - priorTime).getText(context, startTime).toString().toComplicationText()
+            else -> {
+                verbose("Stopwatch paused")
+//                val resultStr = stopwatchDiffText(startTime - priorTime).getText(context, startTime).toString()
+//                resultStr.toComplicationText()
+                relativeTimeString(startTime - priorTime).toComplicationText()
+            }
         }
+
+        verbose { "Setting stopwatch text to {${complicationText.getText(context, System.currentTimeMillis())}}" }
 
         if(small)
             builder.setShortText(complicationText)

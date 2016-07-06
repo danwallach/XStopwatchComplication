@@ -22,20 +22,19 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     /**
      * if the timer's not running, this says how far we got (i.e., we're at startTime + elapsedTime, and 0 <= elapsedTime <= duration)
      */
-    var elapsedTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_ELAPSED_TIME}", 0) ?: 0
+    var elapsedTime = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_ELAPSED_TIME}", 0)
         private set
 
     /**
      * when the timer started running
      */
-    var startTime = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0) ?: 0
+    var startTime = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0)
         private set
 
     /**
      * when the timer ends (i.e., the timer completes at startTime + duration, assuming it's running). Default: one minute (60,000 sec)
      */
-    var duration = prefs?.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_DURATION}", Constants.TIMER_DEFAULT_VALUE)
-            ?: Constants.TIMER_DEFAULT_VALUE
+    var duration = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_DURATION}", Constants.TIMER_DEFAULT_VALUE)
         private set
 
     override fun saveState(editor: SharedPreferences.Editor) {
@@ -187,7 +186,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
             isRunning -> timerDiffText(startTime + duration)
 
         // complicated way of finding out how to represent "0"
-//            isReset -> stopwatchDiffText(startTime).getText(context, startTime).toString().toComplicationText()
+            isReset -> timerDiffText(startTime).getText(context, startTime).toString().toComplicationText()
 
         // complicated way of finding how how to represent the time when the user hit "pause"
             else -> timerDiffText(startTime + elapsedTime + duration)

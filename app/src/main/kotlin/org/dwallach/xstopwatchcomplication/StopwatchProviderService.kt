@@ -20,7 +20,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      * is called.
      */
     override fun onComplicationActivated(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationActivated(): complicationId($complicationId), complicationType($complicationType)" }
+        debug { "onComplicationActivated: complicationId($complicationId), complicationType($complicationType)" }
         super.onComplicationActivated(complicationId, complicationType, complicationManager)
 
         StopwatchState(complicationId).register(this) // create state for the complication and save it away
@@ -38,7 +38,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      *       ProviderUpdateRequester.requestUpdate() method.
      */
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationUpdate: complicationId($complicationId), complicationTYpe($complicationType)" }
+        debug { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
 
         val state = SharedState[complicationId]
         if(state == null) {
@@ -65,12 +65,15 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
                         .build()
 
             ComplicationData.TYPE_SHORT_TEXT ->
-                ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
+                ComplicationData.Builder(ComplicationData.TYPE_SHORT_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
                         .setTapAction(tapPendingIntent)
                         .styleStopwatchText(this, true, state)
                         .build()
 
+            // For now, we're doing basically the same thing with "long" as "short" text,
+            // since a stopwatch / timer's output fits in 7 characters or less. At some
+            // point we might try to be fancier.
             ComplicationData.TYPE_LONG_TEXT ->
                 ComplicationData.Builder(ComplicationData.TYPE_LONG_TEXT)
                         .setIcon(Icon.createWithResource(this, R.drawable.ic_stopwatch_flat))
