@@ -122,22 +122,22 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * notification cards for any other stopwatch/timer notifications.
      */
     fun notify(context: Context) {
-        // some Kotlin gynmastics here to make sure we're dealing with a non-null NotificationHelper
+        // some Kotlin gymnastic here to make sure we're dealing with a non-null NotificationHelper
+        // and that we have only one active notificationHelper at a time
 
         val myNotificationHelper = notificationHelper ?: {
-            // a different complication has it -- kill!
             activeStates().forEach {
                 if(it.notificationHelper != null) {
                     it.notificationHelper?.kill(context)
                     it.notificationHelper = null
                 }
             }
-            NotificationHelper(this)
+            NotificationHelper(context, this)
         }()
 
         // at this point, we own the notificationHelper, but Kotlin doesn't believe it
-        verbose { "Posting notification: ${toString()}"}
-        myNotificationHelper.notify(context, eventTime())
+        verbose { "Posting notification: ${toString()}" }
+        myNotificationHelper.notify(context)
         notificationHelper = myNotificationHelper // save it for later
     }
 
@@ -211,21 +211,21 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
                 Intent(context, NotificationService::class.java).apply {
-                    setAction(context.getString(R.string.action_tap))
+                    action = context.getString(R.string.action_tap)
                     putExtra("complicationId", complicationId)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         clickPlayPausePendingIntent = PendingIntent.getService(context, 0,
                 Intent(context, NotificationService::class.java).apply {
-                    setAction(context.getString(R.string.action_playpause))
+                    action = context.getString(R.string.action_playpause)
                     putExtra("complicationId", complicationId)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         clickResetPendingIntent = PendingIntent.getService(context, 0,
                 Intent(context, NotificationService::class.java).apply {
-                    setAction(context.getString(R.string.action_reset))
+                    action = context.getString(R.string.action_reset)
                     putExtra("complicationId", complicationId)
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT)
@@ -260,8 +260,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
     /**
      * Forces the watchface to request an update to the complication
      */
-    fun forceUpdate(context: Context) =
+    fun forceUpdate(context: Context) {
+        verbose { "forceUpdate: componentName($componentName), complicationId($complicationId)" }
         ProviderUpdateRequester(context, componentName).requestUpdate(complicationId)
+    }
 
     abstract val componentName: ComponentName
 

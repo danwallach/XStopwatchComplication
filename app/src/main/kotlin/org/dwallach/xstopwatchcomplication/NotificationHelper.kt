@@ -5,25 +5,29 @@ import android.graphics.BitmapFactory
 import android.support.v7.app.NotificationCompat
 import org.jetbrains.anko.*
 
-class NotificationHelper(private val state: SharedState): AnkoLogger {
-    private val notificationId = state.complicationId
-    private val iconId = state.flatIconId
+class NotificationHelper(context: Context, private val state: SharedState): AnkoLogger {
+    private val notificationId = 0 // we're going to have exactly one notification, so always easy to kill
+    private val smallIconId = state.flatIconId
+    private val largeIconId = state.selectedIconId
     private val title = state.shortName
 
+    val bg = BitmapFactory.decodeResource(context.resources, largeIconId)
+
     fun kill(context: Context) {
-        verbose { "nuking notification #$notificationId" }
+        verbose { "nuking notification" }
 
         try {
             context.notificationManager.cancel(notificationId)
 
         } catch (throwable: Throwable) {
-            error("failed to cancel notifications", throwable)
+            info("failed to cancel notifications", throwable)
         }
-
     }
 
-    fun notify(context: Context, eventTime: Long) {
-        verbose { "Notifying for complicationId($notificationId), eventTime($eventTime)" }
+    fun notify(context: Context) {
+        verbose { "Notifying for $title, display(${state.displayTime()}" }
+
+        kill(context) // kill off any old notification
 
         // Google docs for this:
         // http://developer.android.com/training/notify-user/build-notification.html
@@ -33,8 +37,6 @@ class NotificationHelper(private val state: SharedState): AnkoLogger {
 
         // This seems to explain what I want to do:
         // http://stackoverflow.com/questions/24494663/how-to-add-button-directly-on-notification-on-android-wear
-
-        val bg = BitmapFactory.decodeResource(context.resources, iconId)
 
         if (state.clickResetPendingIntent == null) {
             error { "No clickResetPendingIntent" }
@@ -50,38 +52,43 @@ class NotificationHelper(private val state: SharedState): AnkoLogger {
         // for in specific places below), which really shouldn't be necessary but hopefully does the job
 
         val notification = NotificationCompat.Builder(context).apply {
-            addAction(android.R.drawable.ic_menu_close_clear_cancel, "", state.clickResetPendingIntent)
+            addAction(android.R.drawable.ic_menu_close_clear_cancel, "Reset", state.clickResetPendingIntent)
 
             if(state.clickConfigurePendingIntent != null)
-                addAction(android.R.drawable.ic_menu_edit, "", state.clickConfigurePendingIntent)
+                addAction(android.R.drawable.ic_menu_edit, "Configure", state.clickConfigurePendingIntent)
 
             if (!state.isRunning) {
-                addAction(android.R.drawable.ic_media_play, "", state.clickPlayPausePendingIntent)
-                setContentText(state.displayTime())
+                addAction(android.R.drawable.ic_media_play, "Play", state.clickPlayPausePendingIntent)
+                setContentText("+>" + state.displayTime())
                 setContentTitle(title) // deliberately backwards for these two so the peek card has the important stuff above the fold
             } else {
-                addAction(android.R.drawable.ic_media_pause, "", state.clickPlayPausePendingIntent)
-                setWhen(eventTime)
+                addAction(android.R.drawable.ic_media_pause, "Pause", state.clickPlayPausePendingIntent)
+//                setWhen(eventTime)
                 setContentText(title)
-                setUsesChronometer(true)
-                setShowWhen(true)
+                setContentText("||" + state.displayTime())
+                // we'll disable the chronometer feature while we're sorting out the rest
+//                setUsesChronometer(true)
+//                setShowWhen(true)
             }
 
             // we want the media buttons to appear in our tiny notification, so here we're saying that
             // we do indeed want all of them
-            if (state.clickConfigurePendingIntent != null)
-                setStyle(NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1, 2))
-            else
-                setStyle(NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1))
+//            if (state.clickConfigurePendingIntent != null)
+//                setStyle(NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1, 2))
+//            else
+//                setStyle(NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1))
 
             setOngoing(true)
             setLocalOnly(true)
-            setSmallIcon(iconId)
+            setSmallIcon(smallIconId)
+            setLargeIcon(bg)
 
-            extend(android.support.v4.app.NotificationCompat.WearableExtender()
+            // TODO: add setHintLaunchesActivity for the configuration button
+            // TODO: redo the configuration intent to launch an activity
+//            extend(android.support.v4.app.NotificationCompat.WearableExtender()
 //                    .setHintHideIcon(true)
-                    .setContentAction(0)
-                    .setBackground(bg))
+//                    .setContentAction(0)
+//                    .setBackground(bg))
         }.build()
 
         // launch the notification
