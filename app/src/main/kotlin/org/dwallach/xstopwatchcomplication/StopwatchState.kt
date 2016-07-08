@@ -148,3 +148,11 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         }
     }
 }
+
+/**
+ * Kotlin extension functions FTW. This just calls TimerState.styleComplicationBuilder.
+ */
+fun ComplicationData.Builder.styleStopwatchText(context: Context, small: Boolean, stopwatchState: StopwatchState): ComplicationData.Builder {
+    stopwatchState.styleComplicationBuilder(context, small, this)
+    return this
+}
