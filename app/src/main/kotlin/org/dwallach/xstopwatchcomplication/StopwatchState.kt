@@ -37,19 +37,37 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         priorTime = 0
         startTime = 0
 
+        stopRedrawing()
         super.reset(context)
     }
 
     override fun run(context: Context) {
         startTime = currentTime()
 
+        startRedrawing()
         super.run(context)
+    }
+
+    private fun startRedrawing() {
+        if (activeComplicationId == complicationId && activity != null)
+            activity?.startRedrawing()
+    }
+
+    private fun stopRedrawing() {
+        if (activeComplicationId == complicationId && activity != null)
+            activity?.stopRedrawing()
+    }
+
+    fun setActivity(a: StopwatchActivity) {
+        activity = a
+        activeComplicationId = complicationId
     }
 
     override fun pause(context: Context) {
         val pauseTime = currentTime()
         priorTime += pauseTime - startTime
 
+        stopRedrawing()
         super.pause(context)
     }
 
@@ -64,13 +82,12 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         }
 
     private fun stopwatchDiffText(start: Long): ComplicationText {
-        verbose { "Computing stopwatchDiffText(${start}) -> ${relativeTimeString(start)}" }
+        verbose { "Computing stopwatchDiffText($start) -> ${relativeTimeString(start)}" }
         return ComplicationText.TimeDifferenceBuilder()
                 .setReferencePeriodEnd(start)
                 .setStyle(ComplicationText.DIFFERENCE_STYLE_STOPWATCH)
                 .build()
     }
-
 
     override fun styleComplicationBuilder(context: Context, small: Boolean, builder: ComplicationData.Builder) {
         val complicationText: ComplicationText = when {
@@ -120,12 +137,14 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         get() = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderState")
 
     override fun toString(): String = "${super.toString()}, priorTime($priorTime), startTime($startTime)"
-}
 
-/**
- * Kotlin extension functions FTW. This just calls StopwatchState.styleComplicationBuilder.
- */
-fun ComplicationData.Builder.styleStopwatchText(context: Context, small: Boolean, stopwatchState: StopwatchState): ComplicationData.Builder {
-    stopwatchState.styleComplicationBuilder(context, small, this)
-    return this
+    companion object {
+        private var activity: StopwatchActivity? = null
+        private var activeComplicationId: Int = -1
+
+        fun nukeActivity() {
+            activity = null
+            activeComplicationId = -1
+        }
+    }
 }

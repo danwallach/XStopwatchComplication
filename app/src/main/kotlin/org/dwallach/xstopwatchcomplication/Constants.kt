@@ -27,4 +27,7 @@ object Constants {
     const val SUFFIX_DURATION = ".duration"
 
     const val TIMER_DEFAULT_VALUE = 600000L // 10 minutes in milliseconds
+
+    // used for intent
+    const val COMPLICATION_ID = "complicationId"
 }

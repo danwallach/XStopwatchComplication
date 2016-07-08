@@ -54,7 +54,7 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
          */
         fun kickStart(context: Context) {
             if (singletonService == null) {
-                verbose("launching watch calendar service")
+                verbose("launching notification service")
                 context.startService(context.intentFor<NotificationService>().setAction(Intent.ACTION_DEFAULT))
             }
 

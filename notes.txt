@@ -1,38 +1,21 @@
+New design direction: activities are good, notifications are bad!
+
 Finish stopwatch
     DONE? register for clicks from the watchface
     DONE? make the watchface to get an update from us when our state changes
 
-    Notification / activity / menu choices
-        DONE? "MediaStyle" notification with buttons (actions -> pending intents -> our notification service)
-        DONE? Use of chronometer feature
-        Further details, Google IO video:
-        https://www.youtube.com/watch?v=6eFQbC5r17w&list=PLWz5rJ2EKKc8jQTUYvIfqA9lMvSGQWtte&index=59
-
-	TODO NotificationListenerService: requests to bind and unbind when there's nothing worth listening to (eg, when we have no active complications)
-	TODO setColor for tinting (different for stopwatch / timer) - replace "setBackground"
-	DONE? Add BroadcastReceiver for boot-completed and results from pending intents
-	DONE? manifest.xml with all the trimmings
-
-	DONE? set desired order of complications (small, big, icon-only, etc.)
-	  -- this seems to come from the watchface, not from us, so nothing to do for now
-
-	TODO "Ok Google, start stopwatch" -- requires an activity?
+    TODO build layout for stopwatch activity
+      TODO activity listed in manifest
+      TODO only one at a time: infrastructure to kill the old ones!
+  	  TODO "Ok Google, start stopwatch"
 
 Add timer support
-    DONE? port over the StopwatchState to fit the new world order
-    DONE? make the watchface to get an update from us when our state changes
-    TODO time picker fragment
-    TODO verify whether Wear 2.0 has a time picker that actually works
-    DONE? yet another notification / activity / menu choices
-    DONE? figure out how to set an alarm
-    DONE? make sure we can kill alarms when a complication is deregistered
 
-	TODO "Ok Google, start a 10 minute timer" -- requires an activity?
-
-Add preferences saving?
-    DONE? dump all SharedState instances so they can be restored later?
-    DONE? how do we know when we're being restored?
-    -- in theory, we're just a normal service, so we can have onCreate and onDestroy
+    TODO build layout for timer activity
+      TODO activity listed in manifest
+      TODO time picker fragment
+        TODO verify whether Wear 2.0 has a time picker that actually works
+	  TODO "Ok Google, start a 10 minute timer" -- requires an activity?
 
 Lifecyle goodies
     Two sorts of services: NotificationService and *ProviderService; both now will restore state, if necessary

@@ -61,7 +61,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected set
     var isReset = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
         protected set
-    var notificationHelper: NotificationHelper? = null
 
 
     open fun reset(context: Context) {
@@ -69,7 +68,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         isRunning = false
         isReset = true
 
-        notify(context)
         forceUpdate(context)
     }
 
@@ -77,7 +75,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         verbose { "$type($complicationId) alarm!" }
         // the timer will do more with this; it's meaningless for the stopwatch
 
-        notify(context)
         forceUpdate(context)
     }
 
@@ -92,8 +89,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         isReset = false
         isRunning = true
 
-
-        notify(context)
         forceUpdate(context)
     }
 
@@ -102,44 +97,18 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
         isRunning = false
 
-        notify(context)
         forceUpdate(context)
     }
 
     /**
-     * click from the watchface, for which we'll just pop up the notification
+     * click from the watchface: this is dead code, since we're going to set up the
+     * intent to directly launch the activity
      */
     open fun click(context: Context) {
         verbose { "$type($complicationId) click" }
-
-        notify(context)
     }
 
     fun playpause(context: Context) = if (isRunning) pause(context) else run(context)
-
-    /**
-     * Pops up a notification card for this complication and kills off any other
-     * notification cards for any other stopwatch/timer notifications.
-     */
-    fun notify(context: Context) {
-        // some Kotlin gymnastic here to make sure we're dealing with a non-null NotificationHelper
-        // and that we have only one active notificationHelper at a time
-
-        val myNotificationHelper = notificationHelper ?: {
-            activeStates().forEach {
-                if(it.notificationHelper != null) {
-                    it.notificationHelper?.kill(context)
-                    it.notificationHelper = null
-                }
-            }
-            NotificationHelper(context, this)
-        }()
-
-        // at this point, we own the notificationHelper, but Kotlin doesn't believe it
-        verbose { "Posting notification: ${toString()}" }
-        myNotificationHelper.notify(context)
-        notificationHelper = myNotificationHelper // save it for later
-    }
 
     /**
      * Return the time of either when the stopwatch began or when the countdown ends.
@@ -241,7 +210,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
     open fun deregister(context: Context) {
         verbose { "Deregistering $complicationId" }
 
-        notificationHelper?.kill(context)
         stateRegistry.remove(complicationId)
 
         clickPlayPausePendingIntent?.cancel()
@@ -271,7 +239,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected val stateRegistry: MutableMap<Int,SharedState> = HashMap()
         private var restoreNecessary: Boolean = true // starts off true, set false once we've restored
 
-        fun currentTime() = System.currentTimeMillis()
+        fun currentTime(): Long = System.currentTimeMillis()
 
         /**
          * Fetch the shared state for a given complication. Results might be null
