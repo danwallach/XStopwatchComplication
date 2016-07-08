@@ -14,8 +14,8 @@ import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ProviderUpdateRequester
 import android.text.format.DateUtils
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.verbose
+import org.jetbrains.anko.*
+import org.jetbrains.anko.intentFor
 import java.util.*
 
 /**
@@ -162,12 +162,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
     var tapComplicationPendingIntent: PendingIntent? = null
         protected set
-    var clickPlayPausePendingIntent: PendingIntent? = null
-        protected set
-    var clickResetPendingIntent: PendingIntent? = null
-        protected set
-    var clickConfigurePendingIntent: PendingIntent? = null
-        protected set
 
     /**
      * We're maintaining a shared registry, mapping from complicationId to the shared-state instance.
@@ -179,28 +173,9 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         stateRegistry[complicationId] = this
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
-                Intent(context, NotificationService::class.java).apply {
-                    action = context.getString(R.string.action_tap)
-                    putExtra("complicationId", complicationId)
-                },
+                context.intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
+                        .setAction(context.getString(R.string.action_tap)),
                 PendingIntent.FLAG_UPDATE_CURRENT)
-
-        clickPlayPausePendingIntent = PendingIntent.getService(context, 0,
-                Intent(context, NotificationService::class.java).apply {
-                    action = context.getString(R.string.action_playpause)
-                    putExtra("complicationId", complicationId)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT)
-
-        clickResetPendingIntent = PendingIntent.getService(context, 0,
-                Intent(context, NotificationService::class.java).apply {
-                    action = context.getString(R.string.action_reset)
-                    putExtra("complicationId", complicationId)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT)
-
-        // we're not initializing the clickConfigurePendingIntent here, since that's only used
-        // for the timer; it will be initialized in TimerState.kt
     }
 
     /**
@@ -211,15 +186,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         verbose { "Deregistering $complicationId" }
 
         stateRegistry.remove(complicationId)
-
-        clickPlayPausePendingIntent?.cancel()
-        clickPlayPausePendingIntent = null
-
-        clickResetPendingIntent?.cancel()
-        clickResetPendingIntent = null
-
-        clickConfigurePendingIntent?.cancel()
-        clickConfigurePendingIntent = null
 
         tapComplicationPendingIntent?.cancel()
         tapComplicationPendingIntent = null

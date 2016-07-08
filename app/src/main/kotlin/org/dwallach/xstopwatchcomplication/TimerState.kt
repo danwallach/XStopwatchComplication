@@ -136,10 +136,8 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
                 // TODO should we instead use one action? Would that work?
                 PendingIntent.getService(context, 0,
-                        Intent(context, NotificationService::class.java).apply {
-                            setAction(context.getString(R.string.action_timer_complete))
-                            putExtra("complicationId", complicationId)
-                        },
+                        context.intentFor<NotificationService>(Constants.COMPLICATION_ID to complicationId)
+                                .setAction(context.getString(R.string.action_timer_complete)),
                         PendingIntent.FLAG_UPDATE_CURRENT)
 
         pendingIntentCache = result
@@ -158,25 +156,21 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         pendingIntentCache = null
     }
 
+    override fun register(context: Context) {
+        super.register(context)
+
+        tapComplicationPendingIntent = PendingIntent.getService(context, 0,
+                // TODO change to TimerActivity
+                context.intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
+                        .setAction(context.getString(R.string.action_tap)),
+                PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
     override fun deregister(context: Context) {
         verbose("deregister")
         super.deregister(context)
         deregisterTimerCompleteAlarm(context)
     }
-
-    override fun register(context: Context) {
-        verbose("register")
-        super.register(context)
-
-
-        clickConfigurePendingIntent = PendingIntent.getService(context, 0,
-                Intent(context, NotificationService::class.java).apply {
-                    setAction(context.getString(R.string.action_configure))
-                    putExtra("complicationId", complicationId)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
 
     private fun timerDiffText(completionTime: Long): ComplicationText =
             ComplicationText.TimeDifferenceBuilder()
