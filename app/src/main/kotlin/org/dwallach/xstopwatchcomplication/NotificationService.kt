@@ -25,6 +25,12 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         super.onCreate()
         verbose("onCreate")
 
+        actionTimerComplete = getString(R.string.action_timer_complete)
+        actionPlayPause = getString(R.string.action_playpause)
+        actionConfigure = getString(R.string.action_configure)
+        actionReset = getString(R.string.action_reset)
+        actionTap = getString(R.string.action_tap)
+
         SharedState.restoreEverything(this)
     }
 
@@ -51,7 +57,15 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
                 verbose("launching watch calendar service")
                 context.startService(context.intentFor<NotificationService>().setAction(Intent.ACTION_DEFAULT))
             }
+
         }
+
+        lateinit var actionTimerComplete: String
+        lateinit var actionPlayPause: String
+        lateinit var actionConfigure: String
+        lateinit var actionReset: String
+        lateinit var actionTap: String
+
 
         /**
          * Given an intent, crack it open and figure out what we're supposed to do with it.
@@ -74,40 +88,21 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
                 return
             }
 
-            // We could have multiple timers, so each one will have its own action, which
-            // is just the same prefix with the complicationId bolted on at the end.
-            if(action.startsWith(Constants.ACTION_TIMER_COMPLETE)) {
-                val complicationId = action.substring(Constants.ACTION_TIMER_COMPLETE.length).toInt()
-                SharedState[complicationId]?.alarm(context)
-                return
+            val complicationId = intent.getIntExtra("complicationId", -1)
+            val complicationState = SharedState[complicationId]
+
+            if(complicationState == null) {
+                errorLogAndThrow("no state to handle intent action($action) for complicationId($complicationId)")
             }
 
-            // In this case, we're getting a click from the complication. Same encoding as above.
-            if(action.startsWith(Constants.ACTION_COMPLICATION_TAP)) {
-                val complicationId = action.substring(Constants.ACTION_COMPLICATION_TAP.length).toInt()
-                SharedState[complicationId]?.click(context)
-                return
+            when(action) {
+                actionTimerComplete -> complicationState.alarm(context)
+                actionPlayPause -> complicationState.playpause(context)
+                actionConfigure -> complicationState.configure(context)
+                actionReset -> complicationState.configure(context)
+                actionTap -> complicationState.click(context)
+                else -> errorLogAndThrow("unknown action($action)")
             }
-
-            if(action.startsWith(Constants.ACTION_CONFIGURE)) {
-                val complicationId = action.substring(Constants.ACTION_CONFIGURE.length).toInt()
-                SharedState[complicationId]?.configure(context)
-                return
-            }
-
-            if(action.startsWith(Constants.ACTION_PLAYPAUSE)) {
-                val complicationId = action.substring(Constants.ACTION_PLAYPAUSE.length).toInt()
-                SharedState[complicationId]?.playpause(context)
-                return
-            }
-
-            if(action.startsWith(Constants.ACTION_RESET)) {
-                val complicationId = action.substring(Constants.ACTION_RESET.length).toInt()
-                SharedState[complicationId]?.reset(context)
-                return
-            }
-
-            throw InternalError("Undefined action: $action")
         }
     }
 }

@@ -84,6 +84,10 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         updateBuzzTimer(context)
     }
 
+    override fun configure(context: Context) {
+        verbose("TODO: launch configuration activity")
+    }
+
     override fun alarm(context: Context) {
         // four short buzzes within one second total time
         val vibratorPattern = longArrayOf(100, 200, 100, 200, 100, 200, 100, 200)
@@ -126,14 +130,17 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     private fun getPendingIntent(context: Context): PendingIntent {
         val result = pendingIntentCache ?:
-            // Engineering note: we're using one Intent "action" per complication, each with its own
-            // action name. We could potentially make all the intents with the same action name and
-            // instead use extras for the complicationId.
+                // Engineering note: we're using one Intent "action" per complication, each with its own
+                // action name. We could potentially make all the intents with the same action name and
+                // instead use extras for the complicationId.
 
-            // TODO should we instead use one action? Would that work?
-            PendingIntent.getService(context, 0,
-                    Intent(Constants.ACTION_TIMER_COMPLETE + complicationId, null, context, NotificationService::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+                // TODO should we instead use one action? Would that work?
+                PendingIntent.getService(context, 0,
+                        Intent(context, NotificationService::class.java).apply {
+                            setAction(context.getString(R.string.action_timer_complete))
+                            putExtra("complicationId", complicationId)
+                        },
+                        PendingIntent.FLAG_UPDATE_CURRENT)
 
         pendingIntentCache = result
         return result
@@ -161,14 +168,13 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         verbose("register")
         super.register(context)
 
-        clickConfigurePendingIntent =
-//                PendingIntent.getService(context, 0,
-//                        Intent(Constants.ACTION_CONFIGURE + complicationId, null, context, NotificationService::class.java),
-//                        PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // TODO: replace null with a reference to a time picker activity
-            PendingIntent.getActivity(context, 1, Intent(context, null /* activity */), 0)
-
+        clickConfigurePendingIntent = PendingIntent.getService(context, 0,
+                Intent(context, NotificationService::class.java).apply {
+                    setAction(context.getString(R.string.action_configure))
+                    putExtra("complicationId", complicationId)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
 

@@ -58,6 +58,7 @@ android {
         targetSdkVersion 'N'
         versionCode getVersionCode()
         versionName getVersionName()
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -77,7 +78,7 @@ dependencies {
 
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'
-//    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
 
     compile "org.jetbrains.anko:anko-sdk15:$anko_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

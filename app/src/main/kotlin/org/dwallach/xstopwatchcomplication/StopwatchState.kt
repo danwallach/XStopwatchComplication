@@ -119,7 +119,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     override val componentName: ComponentName
         get() = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderState")
 
-    override fun toString(): String = "${super.toString()} priorTime($priorTime), startTime($startTime)"
+    override fun toString(): String = "${super.toString()}, priorTime($priorTime), startTime($startTime)"
 }
 
 /**

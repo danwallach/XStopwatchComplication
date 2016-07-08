@@ -106,7 +106,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         forceUpdate(context)
     }
 
-    fun click(context: Context) {
+    /**
+     * click from the watchface, for which we'll just pop up the notification
+     */
+    open fun click(context: Context) {
         verbose { "$type($complicationId) click" }
 
         notify(context)
@@ -119,7 +122,9 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * notification cards for any other stopwatch/timer notifications.
      */
     fun notify(context: Context) {
-        if(notificationHelper == null) {
+        // some Kotlin gynmastics here to make sure we're dealing with a non-null NotificationHelper
+
+        val myNotificationHelper = notificationHelper ?: {
             // a different complication has it -- kill!
             activeStates().forEach {
                 if(it.notificationHelper != null) {
@@ -127,11 +132,13 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
                     it.notificationHelper = null
                 }
             }
-            notificationHelper = NotificationHelper(this)
-        }
+            NotificationHelper(this)
+        }()
+
         // at this point, we own the notificationHelper, but Kotlin doesn't believe it
         verbose { "Posting notification: ${toString()}"}
-        notificationHelper?.notify(context, eventTime())
+        myNotificationHelper.notify(context, eventTime())
+        notificationHelper = myNotificationHelper // save it for later
     }
 
     /**
@@ -198,22 +205,33 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * This is initialized when the complication is activated.
      */
     open fun register(context: Context) {
+        verbose { "Registering $complicationId" }
+
         stateRegistry[complicationId] = this
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
-                Intent(Constants.ACTION_COMPLICATION_TAP + complicationId, null, context, NotificationService::class.java),
+                Intent(context, NotificationService::class.java).apply {
+                    setAction(context.getString(R.string.action_tap))
+                    putExtra("complicationId", complicationId)
+                },
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         clickPlayPausePendingIntent = PendingIntent.getService(context, 0,
-                Intent(Constants.ACTION_PLAYPAUSE + complicationId, null, context, NotificationService::class.java),
+                Intent(context, NotificationService::class.java).apply {
+                    setAction(context.getString(R.string.action_playpause))
+                    putExtra("complicationId", complicationId)
+                },
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         clickResetPendingIntent = PendingIntent.getService(context, 0,
-                Intent(Constants.ACTION_RESET + complicationId, null, context, NotificationService::class.java),
+                Intent(context, NotificationService::class.java).apply {
+                    setAction(context.getString(R.string.action_reset))
+                    putExtra("complicationId", complicationId)
+                },
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         // we're not initializing the clickConfigurePendingIntent here, since that's only used
-        // for the timer
+        // for the timer; it will be initialized in TimerState.kt
     }
 
     /**
@@ -221,6 +239,8 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * This is called when the complication is deactivated.
      */
     open fun deregister(context: Context) {
+        verbose { "Deregistering $complicationId" }
+
         notificationHelper?.kill(context)
         stateRegistry.remove(complicationId)
 
@@ -250,14 +270,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         private var restoreNecessary: Boolean = true // starts off true, set false once we've restored
 
         fun currentTime() = System.currentTimeMillis()
-
-        /**
-         * What's the right way to represent the time when we've reset the stopwatch or timer?
-         * Eventually, this should go through the ComplicationText libraries, but that seems to
-         * grenade right now, so we'll do this instead.
-         */
-        var zeroResetString: String = DateUtils.formatElapsedTime(0)
-          private set
 
         /**
          * Fetch the shared state for a given complication. Results might be null

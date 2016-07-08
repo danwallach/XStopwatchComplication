@@ -2,4 +2,9 @@
     <string name="app_name">X-Complications</string>
     <string name="stopwatch_provider">Stopwatch</string>
     <string name="timer_provider">Timer</string>
+    <string name="action_timer_complete">org.dwallach.xstopwatchcomplication.timer.ACTION_TIMER_COMPLETE</string>
+    <string name="action_tap">org.dwallach.xstopwatchcomplication.ACTION_TAP</string>
+    <string name="action_playpause">org.dwallach.xstopwatchcomplication.ACTION_PLAYPAUSE</string>
+    <string name="action_reset">org.dwallach.xstopwatchcomplication.ACTION_RESET</string>
+    <string name="action_configure">org.dwallach.xstopwatchcomplication.ACTION_CONFIGURE</string>
 </resources>
