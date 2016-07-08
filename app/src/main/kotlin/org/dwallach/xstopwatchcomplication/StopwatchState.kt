@@ -6,7 +6,6 @@
  */
 package org.dwallach.xstopwatchcomplication
 
-import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
@@ -49,13 +48,13 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         super.run(context)
     }
 
-    override fun register(context: Context) {
-        super.register(context)
+    override fun click(context: Context) {
+        super.click(context)
 
-        tapComplicationPendingIntent = PendingIntent.getService(context, 0,
-                context.intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
-                        .setAction(context.getString(R.string.action_tap)),
-                PendingIntent.FLAG_UPDATE_CURRENT)
+        with(context) {
+            startActivity(intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
+                    .setAction(getString(R.string.action_tap)))
+        }
     }
 
     private fun startRedrawing() {

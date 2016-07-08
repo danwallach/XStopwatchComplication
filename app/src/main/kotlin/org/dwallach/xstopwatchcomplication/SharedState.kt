@@ -101,8 +101,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
     }
 
     /**
-     * click from the watchface: this is dead code, since we're going to set up the
-     * intent to directly launch the activity
+     * click from the watchface: launch the activity!
      */
     open fun click(context: Context) {
         verbose { "$type($complicationId) click" }
@@ -173,7 +172,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         stateRegistry[complicationId] = this
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
-                context.intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
+                context.intentFor<NotificationService>(Constants.COMPLICATION_ID to complicationId)
                         .setAction(context.getString(R.string.action_tap)),
                 PendingIntent.FLAG_UPDATE_CURRENT)
     }

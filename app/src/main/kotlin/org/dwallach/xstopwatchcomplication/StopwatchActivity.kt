@@ -1,9 +1,12 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 
@@ -21,8 +24,6 @@ class StopwatchActivity : Activity(), AnkoLogger {
 
         verbose("onCreate")
 
-        val actionTap = getString(R.string.action_tap)
-
         try {
             val pinfo = packageManager.getPackageInfo(packageName, 0)
             val versionNumber = pinfo.versionCode
@@ -34,9 +35,25 @@ class StopwatchActivity : Activity(), AnkoLogger {
             error("couldn't read version", e)
         }
 
+        createInternal(intent)
+    }
+
+    // this one gets called if we already are running, but now get another message,
+    // perhaps from a different complication
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        verbose("onNewIntent")
+
+        createInternal(intent)
+    }
+
+    private fun createInternal(intent: Intent) {
         logIntent(intent)
         stopRedrawing() // paranoia
         StopwatchState.nukeActivity() // more paranoia
+
+        val actionTap = getString(R.string.action_tap)
 
         // if the user said "OK Google, start stopwatch", then this is how we can tell
         when (intent.action) {
