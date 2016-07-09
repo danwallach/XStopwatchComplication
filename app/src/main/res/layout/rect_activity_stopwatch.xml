@@ -13,7 +13,7 @@
     <TextView
         android:id="@+id/digits"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
+        android:layout_height="54dp"
         android:text="00:00:00"
         android:textSize="36sp"
         android:textColor="@color/primary_text"

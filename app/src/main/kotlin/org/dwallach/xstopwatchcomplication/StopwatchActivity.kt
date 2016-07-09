@@ -87,6 +87,7 @@ class StopwatchActivity : Activity(), AnkoLogger {
     private var continueRefresh = true
 
     fun startRedrawing() {
+        verbose("startRedrawing")
         everySecond = Runnable {
             setStopwatchText()
 
@@ -101,6 +102,7 @@ class StopwatchActivity : Activity(), AnkoLogger {
     }
 
     fun stopRedrawing() {
+        verbose("stopRedrawing")
         continueRefresh = false
     }
 
@@ -126,8 +128,14 @@ class StopwatchActivity : Activity(), AnkoLogger {
             // the broadcast receiver is alive
             NotificationService.kickStart(this)
 
-            resetButton.setOnClickListener { state?.reset(this) }
-            playPauseButton.setOnClickListener { state?.click(this) }
+            resetButton.setOnClickListener {
+                verbose { "resetButton: clicked!" }
+                state?.reset(this)
+            }
+            playPauseButton.setOnClickListener {
+                verbose { "playPauseButton: clicked!" }
+                state?.click(this)
+            }
         }
     }
 
@@ -168,6 +176,6 @@ class StopwatchActivity : Activity(), AnkoLogger {
                         android.R.drawable.ic_media_play)
 
     private fun setStopwatchText() {
-        stopwatchText.text = state?.displayTime()
+        stopwatchText.text = state?.displayTime() ?: "fail!"
     }
 }

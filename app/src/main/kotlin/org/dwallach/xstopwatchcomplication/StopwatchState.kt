@@ -91,7 +91,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         }
 
     private fun stopwatchDiffText(start: Long): ComplicationText {
-        verbose { "Computing stopwatchDiffText($start) -> ${relativeTimeString(start)}" }
+        verbose { "Computing stopwatchDiffText($start) -> ${displayTime(start)}" }
         return ComplicationText.TimeDifferenceBuilder()
                 .setReferencePeriodEnd(start)
                 .setStyle(ComplicationText.DIFFERENCE_STYLE_STOPWATCH)
@@ -110,7 +110,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
                 verbose("Stopwatch is reset")
                 // TODO: figure out why the code below bombs
 //                stopwatchDiffText(startTime).getText(context, startTime).toString().toComplicationText()
-                relativeTimeString(0).toComplicationText()
+                displayTime(0).toComplicationText()
             }
 
         // complicated way of finding how how to represent the time when the user hit "pause"
@@ -118,7 +118,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
                 verbose("Stopwatch paused")
 //                val resultStr = stopwatchDiffText(startTime - priorTime).getText(context, startTime).toString()
 //                resultStr.toComplicationText()
-                relativeTimeString(startTime - priorTime).toComplicationText()
+                displayTime(startTime - priorTime).toComplicationText()
             }
         }
 

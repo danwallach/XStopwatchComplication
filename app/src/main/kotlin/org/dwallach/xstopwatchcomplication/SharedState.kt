@@ -37,23 +37,6 @@ fun String?.safeSplit(separator: String): List<String> =
     if(this == null || this == "") emptyList() else split(separator)
 
 /**
- * Shorthand to make our lives a bit easier
- */
-fun currentTime() = System.currentTimeMillis()
-
-/**
- * This converts an absolute time, as returned by eventTime, to a relative time
- * that might then be displayed. We'll use this locally, but watchfaces will
- * use the complication text thing, with its own built-in formatter.
- */
-fun relativeTimeString(eventTime: Long, isRunning: Boolean = false): String =
-        DateUtils.formatElapsedTime(
-                if (isRunning)
-                    Math.abs(currentTime() - eventTime) / 1000
-                else
-                    Math.abs(eventTime) / 1000)
-
-/**
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
 abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): AnkoLogger {
@@ -138,18 +121,14 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      */
     abstract val type: String
 
+    fun displayTime(constantTime: Long) = DateUtils.formatElapsedTime(Math.abs(constantTime / 1000))
+
     /**
      * This converts an absolute time, as returned by eventTime, to a relative time
      * that might be displayed. This works whether the eventTime is before or after
      * the currentTime, making it useful for both timers and stopwatches.
      */
-    fun displayTime(): String = DateUtils.formatElapsedTime(Math.abs(
-            if (isRunning)
-                currentTime() - eventTime() / 1000
-            else
-                eventTime() / 1000))
-
-
+    fun displayTime(): String = displayTime(if (isRunning) (currentTime() - eventTime()) else eventTime())
 
     override fun toString() = "$shortName[$complicationId]: running($isRunning), reset($isReset), display(${displayTime()})"
 
