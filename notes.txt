@@ -25,3 +25,14 @@ Lifecyle goodies
 i18n/l10n
     TODO bug friends again for i18n text
     TODO RTOL support?
+
+Ambient/Always-On
+    https://developer.android.com/training/wearables/apps/always-on.html
+    TODO detect ambient / etc. modes
+    TODO use alarm manager for 1 Hz updates
+
+Proguard
+    TODO: If this library is passed through proguard optimization, make sure to add the com.google.android.wearable:wearable jar to the list of proguard library jars. Using gradle this can be accomplished by adding the following dependency line:
+         dependencies {
+             provided 'com.google.android.wearable:wearable:1.0+'
+         }

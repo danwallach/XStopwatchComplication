@@ -1,19 +1,17 @@
 package org.dwallach.xstopwatchcomplication
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
+import android.support.wearable.activity.WearableActivity
 import android.widget.ImageButton
 import android.widget.TextView
 
 import kotlinx.android.synthetic.main.activity_stopwatch.*
 import org.jetbrains.anko.*
 
-class StopwatchActivity : Activity(), AnkoLogger {
+class StopwatchActivity : WearableActivity(), AnkoLogger {
     private lateinit var playPauseButton: ImageButton
     private lateinit var stopwatchText: TextView
     private lateinit var handler: Handler
