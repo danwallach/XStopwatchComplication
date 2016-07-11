@@ -9,7 +9,6 @@ package org.dwallach.xstopwatchcomplication
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ProviderUpdateRequester
@@ -40,9 +39,9 @@ fun String?.safeSplit(separator: String): List<String> =
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
 abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): AnkoLogger {
-    var isRunning = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false)
+    var isRunning: Boolean = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false)
         protected set
-    var isReset = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
+    var isReset: Boolean = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
         protected set
 
 
@@ -121,7 +120,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      */
     abstract val type: String
 
-    fun displayTime(constantTime: Long) = DateUtils.formatElapsedTime(Math.abs(constantTime / 1000))
+    fun displayTime(constantTime: Long): String = DateUtils.formatElapsedTime(Math.abs(constantTime / 1000))
 
     /**
      * This converts an absolute time, as returned by eventTime, to a relative time

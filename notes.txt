@@ -9,6 +9,8 @@ Finish stopwatch
       TODO only one at a time: infrastructure to kill the old ones!
   	  TODO "Ok Google, start stopwatch"
 
+    TODO if activity launch still fails, try: METADATA_KEY_PROVIDER_CONFIG_ACTION
+
 Add timer support
 
     TODO build layout for timer activity

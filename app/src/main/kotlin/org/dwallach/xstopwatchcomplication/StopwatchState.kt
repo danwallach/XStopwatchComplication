@@ -37,14 +37,12 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         priorTime = 0
         startTime = 0
 
-        stopRedrawing()
         super.reset(context)
     }
 
     override fun run(context: Context) {
         startTime = currentTime()
 
-        startRedrawing()
         super.run(context)
     }
 
@@ -57,16 +55,6 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         }
     }
 
-    private fun startRedrawing() {
-        if (activeComplicationId == complicationId && activity != null)
-            activity?.startRedrawing()
-    }
-
-    private fun stopRedrawing() {
-        if (activeComplicationId == complicationId && activity != null)
-            activity?.stopRedrawing()
-    }
-
     fun setActivity(a: StopwatchActivity) {
         activity = a
         activeComplicationId = complicationId
@@ -76,7 +64,6 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         val pauseTime = currentTime()
         priorTime += pauseTime - startTime
 
-        stopRedrawing()
         super.pause(context)
     }
 
