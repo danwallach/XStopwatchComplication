@@ -43,6 +43,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected set
     var isReset: Boolean = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
         protected set
+    var isVisible: Boolean = false // this is tweaked by StopwatchText
 
 
     open fun reset(context: Context) {
@@ -127,7 +128,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      * that might be displayed. This works whether the eventTime is before or after
      * the currentTime, making it useful for both timers and stopwatches.
      */
-    fun displayTime(): String = displayTime(if (isRunning) (currentTime() - eventTime()) else eventTime())
+    fun displayTime(): String = displayTime(if (isRunning) (TimeWrapper.localTime - eventTime()) else eventTime())
 
     override fun toString() = "$shortName[$complicationId]: running($isRunning), reset($isReset), display(${displayTime()})"
 
@@ -182,7 +183,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected val stateRegistry: MutableMap<Int,SharedState> = HashMap()
         private var restoreNecessary: Boolean = true // starts off true, set false once we've restored
 
-        fun currentTime(): Long = System.currentTimeMillis()
 
         /**
          * Fetch the shared state for a given complication. Results might be null

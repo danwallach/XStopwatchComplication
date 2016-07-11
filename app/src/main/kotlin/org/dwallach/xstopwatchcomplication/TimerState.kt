@@ -64,11 +64,11 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         if (duration == 0L) return  // don't do anything unless there's a non-zero duration
 
         if (isReset)
-            startTime = SharedState.currentTime()
+            startTime = TimeWrapper.gmtTime
         else {
             // we're resuming from a pause, so we need to shove up the start time
             val pauseTime = startTime + elapsedTime
-            startTime += SharedState.currentTime() - pauseTime
+            startTime += TimeWrapper.gmtTime - pauseTime
         }
 
         super.run(context)
@@ -76,7 +76,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     }
 
     override fun pause(context: Context) {
-        val pauseTime = SharedState.currentTime()
+        val pauseTime = TimeWrapper.gmtTime
         elapsedTime = pauseTime - startTime
         if (elapsedTime > duration) elapsedTime = duration
 
@@ -110,7 +110,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     private fun updateBuzzTimer(context: Context) {
         if (isRunning) {
-            val timeNow = SharedState.currentTime()
+            val timeNow = TimeWrapper.gmtTime
             val alarmTime = duration + startTime
             if (alarmTime > timeNow) {
                 verbose { "setting alarm: ${alarmTime - timeNow} ms in the future" }

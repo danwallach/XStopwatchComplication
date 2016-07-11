@@ -9,3 +9,5 @@ adb shell setprop log.tag.TimerProviderService VERBOSE
 adb shell setprop log.tag.TimerState VERBOSE
 adb shell setprop log.tag.Utils VERBOSE
 adb shell setprop log.tag.StopwatchActivity VERBOSE
+adb shell setprop log.tag.TimeWrapper VERBOSE
+adb shell setprop log.tag.StopwatchText VERBOSE

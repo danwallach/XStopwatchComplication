@@ -41,7 +41,8 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     }
 
     override fun run(context: Context) {
-        startTime = currentTime()
+        TimeWrapper.update()
+        startTime = TimeWrapper.gmtTime
 
         super.run(context)
     }
@@ -61,7 +62,8 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     }
 
     override fun pause(context: Context) {
-        val pauseTime = currentTime()
+        TimeWrapper.update()
+        val pauseTime = TimeWrapper.gmtTime
         priorTime += pauseTime - startTime
 
         super.pause(context)

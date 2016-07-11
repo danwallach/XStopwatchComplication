@@ -3,18 +3,15 @@ package org.dwallach.xstopwatchcomplication
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import android.support.wearable.activity.WearableActivity
 import android.widget.ImageButton
-import android.widget.TextView
 
 import kotlinx.android.synthetic.main.activity_stopwatch.*
 import org.jetbrains.anko.*
 
 class StopwatchActivity : WearableActivity(), AnkoLogger {
+    private lateinit var digits: StopwatchText
     private lateinit var playPauseButton: ImageButton
-    private lateinit var stopwatchText: TextView
-    private lateinit var handler: Handler
     private var state: StopwatchState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +46,7 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     private fun createInternal(intent: Intent) {
         verbose("createInternal")
         logIntent(intent)
-        stopRedrawing() // paranoia
+
         StopwatchState.nukeActivity() // more paranoia
 
         val actionTap = getString(R.string.action_tap)
@@ -82,40 +79,6 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
         }
     }
 
-    private lateinit var everySecond: Runnable
-    private var continueRefresh = true
-
-    private fun reloadRedrawing() {
-        val redrawingMode = state?.isRunning ?: false
-
-        verbose { "reloadRedrawing: $redrawingMode" }
-        if(redrawingMode)
-            startRedrawing()
-        else
-            stopRedrawing()
-    }
-    private fun startRedrawing() {
-        verbose("startRedrawing")
-
-        everySecond = Runnable {
-            setStopwatchText()
-
-            if (continueRefresh) {
-                val currentTime: Long = SharedState.currentTime()
-                val nextTime: Long = 1000L + (currentTime / 1000L) * 1000L
-                handler.postAtTime(everySecond, nextTime)
-            }
-        }
-
-        everySecond.run()
-    }
-
-    private fun stopRedrawing() {
-        verbose("stopRedrawing")
-        continueRefresh = false
-    }
-
-
     private fun launchStopwatch() {
         verbose("launchStopwatch")
         setContentView(R.layout.activity_stopwatch)
@@ -125,14 +88,16 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
 
             val resetButton = it.find<ImageButton>(R.id.resetButton)
             playPauseButton = it.find<ImageButton>(R.id.playPauseButton)
-            stopwatchText = it.find<TextView>(R.id.digits)
+            digits = it.find<StopwatchText>(R.id.digits)
+
+            val lState = state ?: errorLogAndThrow("need non-null state")
 
             // now that we've loaded the state, we know whether we're playing or paused
             setPlayButtonIcon()
-            setStopwatchText()
-            state?.setActivity(this)
+            lState.setActivity(this)
+            digits.setSharedState(lState)
 
-            reloadRedrawing()
+            digits.restartRedrawLoop()
 
             // get the notification service running as well; it will stick around to make sure
             // the broadcast receiver is alive
@@ -140,15 +105,15 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
 
             resetButton.setOnClickListener {
                 verbose("resetButton: clicked!")
-                state?.reset(this)
+                lState.reset(this)
                 setPlayButtonIcon()
-                stopRedrawing()
+                digits.restartRedrawLoop()
             }
             playPauseButton.setOnClickListener {
                 verbose("playPauseButton: clicked!")
-                state?.playpause(this)
+                lState.playpause(this)
                 setPlayButtonIcon()
-                reloadRedrawing()
+                digits.restartRedrawLoop()
             }
         }
     }
@@ -162,21 +127,16 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     override fun onResume() {
         super.onResume()
         verbose("onResume")
-
-        reloadRedrawing()
     }
 
     override fun onPause() {
         super.onPause()
         verbose("onPause")
-
-        stopRedrawing()
     }
 
     override fun onDestroy() {
         verbose("onDestroy")
 
-        stopRedrawing()
         StopwatchState.nukeActivity()
 
         super.onDestroy()
@@ -184,12 +144,8 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
 
     private fun setPlayButtonIcon() =
             playPauseButton.setImageResource(
-                    if(state?.isRunning ?: false)
+                    if (state?.isRunning ?: false)
                         android.R.drawable.ic_media_pause
                     else
                         android.R.drawable.ic_media_play)
-
-    private fun setStopwatchText() {
-        stopwatchText.text = state?.displayTime() ?: "fail!"
-    }
 }
