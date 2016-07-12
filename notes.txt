@@ -6,19 +6,20 @@ Finish stopwatch
       DONE? activity listed in manifest
       DONE? only one at a time: infrastructure to kill the old ones!
   	  DONE? "Ok Google, start stopwatch"
-  	    TODO but what if there isn't an active stopwatch?
 
     TODO ripples don't go away?!
     TODO 60hz animation, crawl progress bar thing on 60-sec schedule?
 
+    TODO support for multiple concurrent stopwatches / multiple concurrent timers?
+
 Add timer support
 
-    TODO build layout for timer activity
-      TODO activity listed in manifest
+    DONE? build layout for timer activity
+      DONE? activity listed in manifest
       TODO time picker fragment
         TODO verify whether Wear 2.0 has a time picker that actually works
-	  TODO "Ok Google, start a 10 minute timer" -- requires an activity?
-	  TODO port over all the changes from Stopwatch
+	  DONE? "Ok Google, start a 10 minute timer" -- requires an activity?
+	  DONE? port over all the changes from Stopwatch
 
 Lifecyle goodies
     Two sorts of services: NotificationService and *ProviderService; both now will restore state, if necessary
@@ -33,6 +34,10 @@ Ambient/Always-On
     https://developer.android.com/training/wearables/apps/always-on.html
     TODO detect ambient / etc. modes
     TODO use alarm manager for 1 Hz updates vs. current use of Handler
+
+"Ok Google" Intents
+    TODO register and deregister for these intents based on whether or not we're set as a complication?
+
 
 Proguard
     TODO: If this library is passed through proguard optimization, make sure to add the com.google.android.wearable:wearable jar to the list of proguard library jars. Using gradle this can be accomplished by adding the following dependency line:

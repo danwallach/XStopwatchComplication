@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.NumberPicker
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.find
+import org.jetbrains.anko.info
 
 class TimePickerFragment() : DialogFragment(), AnkoLogger {
     private var hours: Int
@@ -70,7 +71,8 @@ class TimePickerFragment() : DialogFragment(), AnkoLogger {
             pickerOkButton.setOnClickListener {
                 hours = hoursPicker.value
                 minutes = minutesPicker.value
-                state.setDuration(TimeWrapper.hours(hours.toLong()) + TimeWrapper.minutes(minutes.toLong()))
+                info { "User selected %02d:%02d (hh:mm)".format(hours, minutes) }
+                state.setDuration(TimeWrapper.hours(hours.toLong()) + TimeWrapper.minutes(minutes.toLong()), this.context)
 
                 // okay, we're done!
                 dismiss()

@@ -23,12 +23,9 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
 
     override fun onCreate() {
         super.onCreate()
-        verbose("onCreate")
+        info("onCreate")
 
         actionTimerComplete = getString(R.string.action_timer_complete)
-        actionPlayPause = getString(R.string.action_playpause)
-        actionConfigure = getString(R.string.action_configure)
-        actionReset = getString(R.string.action_reset)
         actionTap = getString(R.string.action_tap)
 
         SharedState.restoreEverything(this)
@@ -37,7 +34,7 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
     override fun onDestroy() {
         super.onDestroy()
         // we're only doing this so we can log when we get destroyed, which will help us debug things
-        verbose("onDestroy")
+        info("onDestroy")
     }
 
     override fun onHandleIntent(intent: Intent) = handleIntent(intent)
@@ -54,16 +51,12 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
          */
         fun kickStart(context: Context) {
             if (singletonService == null) {
-                verbose("launching notification service")
+                info("launching notification service")
                 context.startService(context.intentFor<NotificationService>().setAction(Intent.ACTION_DEFAULT))
             }
-
         }
 
         lateinit var actionTimerComplete: String
-        lateinit var actionPlayPause: String
-        lateinit var actionConfigure: String
-        lateinit var actionReset: String
         lateinit var actionTap: String
 
 
@@ -76,10 +69,10 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
             val action = intent.action
             val context = singletonService
 
-            verbose { "onHandleIntent: action($action)" }
+            info { "onHandleIntent: action($action)" }
 
             if(action == Intent.ACTION_DEFAULT || action == Intent.ACTION_BOOT_COMPLETED) {
-                verbose("kickstart launch, we're good to go")
+                info("kickstart launch, we're good to go")
                 return
             }
 
@@ -97,9 +90,6 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
 
             when(action) {
                 actionTimerComplete -> complicationState.alarm(context)
-                actionPlayPause -> complicationState.playpause(context)
-                actionConfigure -> complicationState.configure(context)
-                actionReset -> complicationState.configure(context)
                 actionTap -> complicationState.click(context)
                 else -> errorLogAndThrow("unknown action($action)")
             }

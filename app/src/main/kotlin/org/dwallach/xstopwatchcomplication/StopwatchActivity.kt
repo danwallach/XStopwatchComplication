@@ -17,7 +17,7 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        verbose("onCreate")
+        info("onCreate")
 
         try {
             val pinfo = packageManager.getPackageInfo(packageName, 0)
@@ -38,13 +38,13 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        verbose("onNewIntent")
+        info("onNewIntent")
 
         createInternal(intent)
     }
 
     private fun createInternal(intent: Intent) {
-        verbose("createInternal")
+        info("createInternal")
         logIntent(intent)
 
         StopwatchState.nukeActive() // more paranoia
@@ -54,20 +54,26 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
         // if the user said "OK Google, start stopwatch", then this is how we can tell
         when (intent.action) {
             "com.google.android.wearable.action.STOPWATCH" -> {
-                verbose("user voice action detected: starting the stopwatch")
+                info("user voice action detected: starting the stopwatch")
                 // find the first stopwatch, based on the smallest complicationId (therefore the oldest)
                 // and tell it to run itself
-                state = SharedState.activeIds()
+                val lState = SharedState.activeIds()
                         .sorted()
                         .map { SharedState[it] }
                         .filter { it is StopwatchState }
                         .firstOrNull() as StopwatchState?
 
+                if(lState == null) {
+                    info("no active stopwatches, so we'll ignore the launch request")
+                    // TODO notify the user that they need to set a complication first?
+                    return
+                }
+
                 state?.run(this)
                 launchStopwatch()
             }
             actionTap -> {
-                verbose("we were tapped, presumably from the watchface!")
+                info("we were tapped, presumably from the watchface!")
                 val complicationId = intent.extras.getInt(Constants.COMPLICATION_ID, -1)
                 state = SharedState[complicationId] as StopwatchState?
                 launchStopwatch()
@@ -80,11 +86,11 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     }
 
     private fun launchStopwatch() {
-        verbose("launchStopwatch")
+        info("launchStopwatch")
         setContentView(R.layout.activity_stopwatch)
 
         watch_view_stub.setOnLayoutInflatedListener {
-            verbose("onLayoutInflated")
+            info("onLayoutInflated")
 
             val resetButton = it.find<ImageButton>(R.id.resetButton)
             playPauseButton = it.find<ImageButton>(R.id.playPauseButton)
@@ -104,13 +110,13 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
             NotificationService.kickStart(this)
 
             resetButton.setOnClickListener {
-                verbose("resetButton: clicked!")
+                info("resetButton: clicked!")
                 lState.reset(this)
                 setPlayButtonIcon()
                 digits.restartRedrawLoop()
             }
             playPauseButton.setOnClickListener {
-                verbose("playPauseButton: clicked!")
+                info("playPauseButton: clicked!")
                 lState.playpause(this)
                 setPlayButtonIcon()
                 digits.restartRedrawLoop()
@@ -121,21 +127,21 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
     override fun onStart() {
         super.onStart()
 
-        verbose("onStart")
+        info("onStart")
     }
 
     override fun onResume() {
         super.onResume()
-        verbose("onResume")
+        info("onResume")
     }
 
     override fun onPause() {
         super.onPause()
-        verbose("onPause")
+        info("onPause")
     }
 
     override fun onDestroy() {
-        verbose("onDestroy")
+        info("onDestroy")
 
         StopwatchState.nukeActive()
 

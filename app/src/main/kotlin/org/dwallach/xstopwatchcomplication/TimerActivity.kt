@@ -8,11 +8,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.AlarmClock
 import android.support.wearable.activity.WearableActivity
-import android.view.View
 import android.widget.ImageButton
 import android.widget.TimePicker
 
 import kotlinx.android.synthetic.main.activity_timer.*
+import kotlinx.android.synthetic.main.rect_activity_stopwatch.*
 import org.jetbrains.anko.*
 
 class TimerActivity : WearableActivity(), AnkoLogger {
@@ -68,6 +68,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
             // Do something with the time chosen by the user
             verbose { "User selected time: %d:%02d".format(hour, minute) }
             state.setDuration(hour * 3600000L + minute * 60000L)
+            digits.invalidate() // force redraw
         }
     }
 
@@ -104,15 +105,23 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
                 // find the first stopwatch, based on the smallest complicationId (therefore the oldest)
                 // and tell it to run itself
-                state = SharedState.activeIds()
+                val lState = SharedState.activeIds()
                         .sorted()
                         .map { SharedState[it] }
                         .filter { it is TimerState }
                         .firstOrNull() as TimerState?
 
+                if(lState == null) {
+                    verbose("no active timers, so we'll ignore the launch request")
+                    // TODO notify the user that they need to set a complication first?
+                    return
+                }
+
+                state = lState
+
                 if(paramLength > 0 && paramLength < TimeWrapper.hours(24))
-                    state?.setDuration(paramLength)
-                state?.run(this)
+                    lState.setDuration(paramLength)
+                lState.run(this)
                 launchTimer()
             }
             actionTap -> {
@@ -130,7 +139,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
     private fun launchTimer() {
         verbose("launchTimer")
-        setContentView(R.layout.activity_stopwatch)
+        setContentView(R.layout.activity_timer)
 
         watch_view_stub.setOnLayoutInflatedListener {
             verbose("onLayoutInflated")

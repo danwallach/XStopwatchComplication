@@ -45,6 +45,12 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_DURATION}", duration)
     }
 
+    override fun logState() {
+        super.logState()
+        verbose { "id$complicationId.${Constants.SUFFIX_ELAPSED_TIME}: ${elapsedTime}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_START_TIME}: ${startTime}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_DURATION}: ${duration}" }
+    }
 
     fun setDuration(duration: Long, context: Context? = null) {
         this.duration = duration
@@ -63,6 +69,8 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     override fun run(context: Context) {
         if (duration == 0L) return  // don't do anything unless there's a non-zero duration
 
+        TimeWrapper.update()
+
         if (isReset)
             startTime = TimeWrapper.gmtTime
         else {
@@ -76,16 +84,14 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     }
 
     override fun pause(context: Context) {
+        TimeWrapper.update()
+
         val pauseTime = TimeWrapper.gmtTime
         elapsedTime = pauseTime - startTime
         if (elapsedTime > duration) elapsedTime = duration
 
         super.pause(context)
         updateBuzzTimer(context)
-    }
-
-    override fun configure(context: Context) {
-        verbose("TODO: launch configuration activity")
     }
 
     fun makeActive() {
@@ -98,10 +104,18 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         val vibratorPattern = longArrayOf(100, 200, 100, 200, 100, 200, 100, 200)
         verbose("buzzing!")
 
-        reset(context) // timer state, also resets the alarm and does a forceUpdate()
-        saveEverything(context)
+        reset(context) // timer state, also resets the alarm, does a forceUpdate(), and saves state
 
         context.vibrator.vibrate(vibratorPattern, -1, AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
+    }
+
+    override fun click(context: Context) {
+        with(context) {
+            startActivity(intentFor<TimerActivity>(Constants.COMPLICATION_ID to complicationId)
+                    .setAction(getString(R.string.action_tap)))
+        }
+
+        super.click(context)
     }
 
     override fun displayTime(): String =
@@ -158,16 +172,6 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         pendingIntentCache = null
     }
 
-    override fun register(context: Context) {
-        super.register(context)
-
-        tapComplicationPendingIntent = PendingIntent.getService(context, 0,
-                // TODO change to TimerActivity
-                context.intentFor<TimerActivity>(Constants.COMPLICATION_ID to complicationId)
-                        .setAction(context.getString(R.string.action_tap)),
-                PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
     override fun deregister(context: Context) {
         verbose("deregister")
         super.deregister(context)
@@ -182,19 +186,24 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
 
     override fun styleComplicationBuilder(context: Context, small: Boolean, builder: ComplicationData.Builder) {
-        if(isReset) return // we'll set no styles when the stopwatch is zeroed
+        val complicationText: ComplicationText = when {
+            isRunning -> {
+                verbose("Timer running")
+                timerDiffText(startTime + duration)
+            }
 
-        val complicationText = when {
-            isRunning -> timerDiffText(startTime + duration)
+            isReset -> {
+                verbose("Timer is reset")
+                displayTime().toComplicationText()
+            }
 
-        // complicated way of finding out how to represent "0"
-            isReset -> timerDiffText(startTime).getText(context, startTime).toString().toComplicationText()
-
-        // complicated way of finding how how to represent the time when the user hit "pause"
-            else -> timerDiffText(startTime + elapsedTime + duration)
-                    .getText(context, startTime + elapsedTime)
-                    .toString().toComplicationText()
+            else -> {
+                verbose("Timer paused")
+                displayTime().toComplicationText()
+            }
         }
+
+        info { "Setting timer text to {${complicationText.getText(context, TimeWrapper.gmtTime)}}" }
 
         if(small)
             builder.setShortText(complicationText)

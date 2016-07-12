@@ -52,6 +52,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         isReset = true
 
         forceUpdate(context)
+        saveEverything(context)
     }
 
     open fun alarm(context: Context) {
@@ -59,11 +60,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         // the timer will do more with this; it's meaningless for the stopwatch
 
         forceUpdate(context)
-    }
-
-    open fun configure(context: Context) {
-        verbose { "$type($complicationId) configure" }
-        // the timer will do more with this; it's meaningless for the stopwatch
+        saveEverything(context)
     }
 
     open fun run(context: Context) {
@@ -73,6 +70,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         isRunning = true
 
         forceUpdate(context)
+        saveEverything(context)
     }
 
     open fun pause(context: Context) {
@@ -81,6 +79,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         isRunning = false
 
         forceUpdate(context)
+        saveEverything(context)
     }
 
     /**
@@ -105,6 +104,12 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         editor.putBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", isRunning)
         editor.putBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", isReset)
         editor.putString("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_TYPE}", type)
+    }
+
+    open fun logState() {
+        verbose { "id$complicationId.${Constants.SUFFIX_RUNNING}: ${isRunning}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_RESET}: ${isReset}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_TYPE}: ${type}" }
     }
 
     /**
@@ -185,7 +190,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         fun activeStates() = stateRegistry.values
 
         fun saveEverything(context: Context) {
-            verbose("saveEverything")
+            info("saveEverything")
 
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).edit().apply {
                 val activeIds = SharedState.activeIds()
@@ -195,6 +200,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
                 activeIds.forEach {
                     SharedState[it]?.saveState(this)
+                    SharedState[it]?.logState()
                 }
 
                 if (!commit())

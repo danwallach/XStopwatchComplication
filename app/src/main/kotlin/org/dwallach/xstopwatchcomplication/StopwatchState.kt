@@ -37,6 +37,13 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         editor.putLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", startTime)
     }
 
+    override fun logState() {
+        super.logState()
+        verbose { "id$complicationId.${Constants.SUFFIX_PRIOR_TIME}: ${priorTime}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_START_TIME}: ${startTime}" }
+    }
+
+
     override fun reset(context: Context) {
         priorTime = 0
         startTime = 0
