@@ -73,8 +73,9 @@ object TimeWrapper: AnkoLogger {
 
     /**
      * Helper function: returns the local time (including daylight savings correction, if necessary) in milliseconds.
+     * (Private here because we want the stopwatch/timer to focus on using the absolute GMT time.)
      */
-    val localTime: Long
+    private val localTime: Long
         get() = gmtTime + gmtOffset
 
     /**

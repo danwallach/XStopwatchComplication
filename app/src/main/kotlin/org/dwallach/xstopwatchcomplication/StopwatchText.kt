@@ -50,49 +50,20 @@ class StopwatchText : View, AnkoLogger {
             style = Paint.Style.FILL
             color = context.getColor(R.color.primary)
             textAlign = Paint.Align.CENTER
-            setTypeface(Typeface.MONOSPACE)
+            typeface = Typeface.MONOSPACE
         }
 
         textPaintAmbient = Paint(Paint.SUBPIXEL_TEXT_FLAG or Paint.HINTING_ON).apply {
             isAntiAlias = false
-            style = Paint.Style.FILL
-            color = Color.WHITE
+            style = Paint.Style.FILL // or maybe some kind of outline text?
+            color = Color.WHITE // or maybe RED?
             textAlign = Paint.Align.CENTER
-            setTypeface(Typeface.MONOSPACE)
+            typeface = Typeface.MONOSPACE
         }
 
         updateTimeHandler = MyHandler(this)
     }
 
-
-    class MyHandler internal constructor(stopwatchText: StopwatchText) : Handler(), AnkoLogger {
-        private val stopwatchTextRef = WeakReference(stopwatchText)
-
-        override fun handleMessage(message: Message) {
-            val stopwatchText = stopwatchTextRef.get() ?: return
-            // oops, it died
-
-            when (message.what) {
-                MSG_UPDATE_TIME -> {
-                    TimeWrapper.update()
-                    val localTime = TimeWrapper.gmtTime
-                    stopwatchText.invalidate()
-                    if (stopwatchText.visible && (stopwatchText.state?.isRunning ?: false)) {
-                        val timeMs = localTime
-                        val delayMs = 1000 - timeMs % 1000
-                        sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
-                    } else {
-                        verbose { "${stopwatchText.shortName}: time handler complete" }
-                    }
-                }
-                else -> {
-                    errorLogAndThrow("unknown message: ${message}")
-                }
-            }
-        }
-
-        // TODO add 60Hz redraw loop, use for some cool rendering as in CalWatch
-    }
 
     fun setSharedState(sharedState: SharedState) {
         this.state = sharedState
@@ -102,7 +73,7 @@ class StopwatchText : View, AnkoLogger {
     override fun onVisibilityChanged(changedView: View?, visibility: Int) {
         visible = visibility == View.VISIBLE
 
-        verbose { "${shortName} visible: ${visible}" }
+        verbose { "$shortName visible: $visible" }
 
         state?.isVisible = visible
 
@@ -124,15 +95,15 @@ class StopwatchText : View, AnkoLogger {
     private var textY: Float = 0.toFloat()
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        verbose { "${shortName} size change: ${w},${h}" }
+        verbose { "$shortName size change: $w,$h" }
         this._width = w
         this._height = h
-        val textSize = h * 3 / 5
+        val textSize = h * .2f
 
-        verbose { "${shortName} new text size: ${textSize}" }
+        verbose { "$shortName new text size: $textSize" }
 
-        textPaint.textSize = textSize.toFloat()
-        textPaintAmbient.textSize = textSize.toFloat()
+        textPaint.textSize = textSize
+        textPaintAmbient.textSize = textSize
         //
         // note: metrics.ascent is a *negative* number while metrics.descent is a *positive* number
         //
@@ -152,30 +123,56 @@ class StopwatchText : View, AnkoLogger {
 
 
     public override fun onDraw(canvas: Canvas) {
-        //        verbose { shortName + "onDraw -- visible: " + visible + ", running: " + state.isRunning() }
+        val lState = state ?: return
 
-        if (state == null) {
-            warn { "${shortName} onDraw: no state yet" }
-            return
-        }
+        verbose { shortName + "onDraw -- visible: " + visible + ", running: " + lState.isRunning }
 
-        val result = state?.displayTime()
+        val timeText = lState.displayTime()
 
-        //        verbose { "update text to: " + result }
+//        verbose { "update text to: " + timeText }
 
         if (_width == 0 || _height == 0) {
-            warn { "${shortName} zero-width or zero-height, can't draw yet" }
+            warn { "$shortName zero-width or zero-height, can't draw yet" }
             return
         }
 
         // clear the screen
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawText(result, textX, textY, textPaint)
+        canvas.drawText(timeText, textX, textY, textPaint)
 
         // TODO add ambient mode
     }
 
     companion object {
         const val MSG_UPDATE_TIME = 0
+
+        private class MyHandler internal constructor(stopwatchText: StopwatchText) : Handler(), AnkoLogger {
+            private val stopwatchTextRef = WeakReference(stopwatchText)
+
+            override fun handleMessage(message: Message) {
+                val stopwatchText = stopwatchTextRef.get() ?: return
+                // oops, it died
+
+                when (message.what) {
+                    MSG_UPDATE_TIME -> {
+                        TimeWrapper.update()
+                        val localTime = TimeWrapper.gmtTime
+                        stopwatchText.invalidate()
+                        if (stopwatchText.visible && (stopwatchText.state?.isRunning ?: false)) {
+                            val timeMs = localTime
+                            val delayMs = 1000 - timeMs % 1000
+                            sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
+                        } else {
+                            verbose { "${stopwatchText.shortName}: time handler complete" }
+                        }
+                    }
+                    else -> {
+                        errorLogAndThrow("unknown message: $message")
+                    }
+                }
+            }
+
+            // TODO add 60Hz redraw loop, use for some cool rendering as in CalWatch
+        }
     }
 }
