@@ -6,6 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:rectLayout="@layout/rect_activity_stopwatch"
-    app:roundLayout="@layout/round_activity_stopwatch"
+    app:roundLayout="@layout/rect_activity_stopwatch"
     tools:context="org.dwallach.xstopwatchcomplication.StopwatchActivity"
-    tools:deviceIds="wear"></android.support.wearable.view.WatchViewStub>
+    tools:deviceIds="wear" />
