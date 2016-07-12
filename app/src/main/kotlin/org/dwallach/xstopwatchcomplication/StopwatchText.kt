@@ -91,8 +91,8 @@ class StopwatchText : View, AnkoLogger {
         }
     }
 
-    private var textX: Float = 0.toFloat()
-    private var textY: Float = 0.toFloat()
+    private var textX: Float = 0f
+    private var textY: Float = 0f
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         verbose { "$shortName size change: $w,$h" }
@@ -108,8 +108,8 @@ class StopwatchText : View, AnkoLogger {
         // note: metrics.ascent is a *negative* number while metrics.descent is a *positive* number
         //
         val metrics = textPaint.fontMetrics
-        textY = -metrics.ascent
-        textX = (w / 2).toFloat()
+        textY = (h - .6f * metrics.ascent) / 2f // worked out empirically, seems to work
+        textX = w / 2f
 
         //
         // In some weird cases, we get an onSizeChanged but not an onVisibilityChanged

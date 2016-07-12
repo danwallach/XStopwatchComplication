@@ -5,9 +5,9 @@ adb shell setprop log.tag.Receiver VERBOSE
 adb shell setprop log.tag.SharedState VERBOSE
 adb shell setprop log.tag.StopwatchProviderServic VERBOSE
 adb shell setprop log.tag.StopwatchState VERBOSE
+adb shell setprop log.tag.StopwatchText VERBOSE
 adb shell setprop log.tag.TimerProviderService VERBOSE
 adb shell setprop log.tag.TimerState VERBOSE
 adb shell setprop log.tag.Utils VERBOSE
 adb shell setprop log.tag.StopwatchActivity VERBOSE
 adb shell setprop log.tag.TimeWrapper VERBOSE
-adb shell setprop log.tag.StopwatchText VERBOSE
