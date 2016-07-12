@@ -8,17 +8,20 @@
     android:orientation="vertical"
     tools:context=".StopwatchActivity"
     tools:deviceIds="wear_square"
+    android:background="?android:attr/selectableItemBackgroundBorderless"
     android:id="@+id/constraintLayout">
 
     <org.dwallach.xstopwatchcomplication.StopwatchText
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:text="00:00.00"
         android:id="@+id/digits"
-        android:typeface="monospace"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toBottomOf="@+id/topIcon"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/resetButton"
+        android:layout_marginBottom="8dp" />
 
     <ImageView
         android:id="@+id/topIcon"
@@ -28,9 +31,11 @@
         android:adjustViewBounds="true"
         tools:ignore="ContentDescription"
         app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        tools:layout_constraintLeft_creator="1"
         app:layout_constraintTop_toTopOf="@+id/constraintLayout"
-        android:layout_marginTop="16dp"
-        app:layout_constraintRight_toRightOf="@+id/constraintLayout" />
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+        tools:layout_constraintRight_creator="1" />
 
     <ImageButton
         android:background="@drawable/ripple"

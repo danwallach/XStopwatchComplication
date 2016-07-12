@@ -84,8 +84,11 @@ class StopwatchText : View, AnkoLogger {
     fun restartRedrawLoop() {
         val lState = state ?: return
 
+        if (lState.isVisible)
+            invalidate() // gets the most current state drawn no matter what
+
         if (lState.isVisible && lState.isRunning) {
-            updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME) // now, rather than later
+            updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME)
         } else {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME)
         }
@@ -98,7 +101,7 @@ class StopwatchText : View, AnkoLogger {
         verbose { "$shortName size change: $w,$h" }
         this._width = w
         this._height = h
-        val textSize = h * .2f
+        val textSize = h * .9f
 
         verbose { "$shortName new text size: $textSize" }
 
@@ -108,7 +111,7 @@ class StopwatchText : View, AnkoLogger {
         // note: metrics.ascent is a *negative* number while metrics.descent is a *positive* number
         //
         val metrics = textPaint.fontMetrics
-        textY = (h - .6f * metrics.ascent) / 2f // worked out empirically, seems to work
+        textY = -metrics.ascent
         textX = w / 2f
 
         //

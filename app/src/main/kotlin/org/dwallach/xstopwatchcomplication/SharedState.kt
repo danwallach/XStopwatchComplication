@@ -93,15 +93,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
     fun playpause(context: Context) = if (isRunning) pause(context) else run(context)
 
     /**
-     * Return the time of either when the stopwatch began or when the countdown ends.
-     * IF RUNNING, this time will be consistent with System.currentTimeMillis(), i.e., in GMT.
-     * IF PAUSED, this time will be relative to zero and will be what should be displayed.
-     * Make sure to call isRunning() to know how to interpret this result.
-     * @return GMT time in milliseconds
-     */
-    abstract fun eventTime(): Long
-
-    /**
      * Convert from the internal representation to a "ComplicationText" object, suitable
      * for passing to a watchface.
      */
@@ -121,14 +112,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
      */
     abstract val type: String
 
-    fun displayTime(constantTime: Long): String = DateUtils.formatElapsedTime(Math.abs(constantTime / 1000))
-
-    /**
-     * This converts an absolute time, as returned by eventTime, to a relative time
-     * that might be displayed. This works whether the eventTime is before or after
-     * the currentTime, making it useful for both timers and stopwatches.
-     */
-    fun displayTime(): String = displayTime(if (isRunning) (TimeWrapper.gmtTime - eventTime()) else eventTime())
+    abstract fun displayTime(): String
 
     override fun toString() = "$shortName[$complicationId]: running($isRunning), reset($isReset), display(${displayTime()})"
 
@@ -242,5 +226,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
                 }
             }
         }
+
+        fun displayTime(timeMS: Long): String = DateUtils.formatElapsedTime(Math.abs(timeMS / 1000))
     }
 }

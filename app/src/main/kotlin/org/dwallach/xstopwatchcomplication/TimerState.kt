@@ -10,11 +10,11 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
+import android.text.format.DateUtils
 
 import org.jetbrains.anko.*
 
@@ -99,16 +99,14 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         context.vibrator.vibrate(vibratorPattern, -1, AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
     }
 
-    override fun eventTime(): Long = when {
-        // IF RUNNING, this time will be consistent with System.currentTimeMillis(), i.e., in GMT.
-        // IF PAUSED, this time will be relative to zero and will be what should be displayed.
+    override fun displayTime(): String =
+            DateUtils.formatElapsedTime(Math.abs(when {
+                isReset -> duration
+                !isRunning -> duration - elapsedTime
+                else -> duration + startTime - TimeWrapper.gmtTime
+            } / 1000.0).toLong())
 
-        isReset -> duration
-        !isRunning -> duration - elapsedTime
-        else -> duration + startTime
-    }
-
-    private fun updateBuzzTimer(context: Context) {
+    private fun updateBuzzTimer(context: Context) =
         if (isRunning) {
             val timeNow = TimeWrapper.gmtTime
             val alarmTime = duration + startTime
@@ -124,7 +122,6 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
             verbose("removing alarm")
             deregisterTimerCompleteAlarm(context)
         }
-    }
 
     private var pendingIntentCache: PendingIntent? = null
 

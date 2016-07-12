@@ -6,12 +6,12 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.*
 
 class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
-
     /*
      * Called when a complication has been activated. The method is for any one-time
      * (per complication) set-up.
@@ -20,7 +20,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      * is called.
      */
     override fun onComplicationActivated(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationActivated: complicationId($complicationId), complicationType($complicationType)" }
+        info { "onComplicationActivated: complicationId($complicationId), complicationType($complicationType)" }
         super.onComplicationActivated(complicationId, complicationType, complicationManager)
 
         StopwatchState(complicationId).register(this) // create state for the complication and save it away
@@ -38,7 +38,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      *       ProviderUpdateRequester.requestUpdate() method.
      */
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
-        debug { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
+        info { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
 
         val state = SharedState[complicationId]
         if(state == null) {
@@ -97,7 +97,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
      * manager outside of this class with updates, you will want to update your class to stop.
      */
     override fun onComplicationDeactivated(complicationId: Int) {
-        debug { "onComplicationDeactivated: $complicationId" }
+        info { "onComplicationDeactivated: $complicationId" }
         super.onComplicationDeactivated(complicationId)
 
         SharedState[complicationId]?.deregister(this)
@@ -106,7 +106,7 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
 
     override fun onCreate() {
         super.onCreate()
-        verbose("onCreate")
+        info("onCreate")
 
         NotificationService.kickStart(this) // start the service if it's not already active
         SharedState.restoreEverything(this)
@@ -115,6 +115,10 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onDestroy() {
         super.onDestroy()
         // we're only doing this so we can log when we get destroyed, which will help us debug things
-        verbose("onDestroy")
+        info("onDestroy")
+    }
+
+    companion object {
+        val componentName = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderService")
     }
 }
