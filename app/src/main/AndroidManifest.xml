@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.dwallach.xstopwatchcomplication">
 
     <uses-feature android:name="android.hardware.type.watch" />
@@ -19,7 +20,8 @@
         <service
             android:name=".StopwatchProviderService"
             android:icon="@drawable/ic_stopwatch_flat"
-            android:label="@string/stopwatch_provider">
+            android:label="@string/stopwatch_provider"
+            tools:ignore="ExportedService">
 
             <intent-filter>
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
@@ -45,11 +47,11 @@
             </intent-filter>
         </activity>
 
-        <!--
         <service
             android:name=".TimerProviderService"
             android:icon="@drawable/ic_sandwatch_flat"
-            android:label="@string/timer_provider">
+            android:label="@string/timer_provider"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
             </intent-filter>
@@ -61,11 +63,12 @@
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="0" />
         </service>
-        -->
+
         <service
             android:name=".NotificationService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="@string/action_timer_complete" />
             </intent-filter>
@@ -74,7 +77,6 @@
             </intent-filter>
         </service>
 
-        <!--
         <activity
             android:name=".TimerActivity"
             android:label="@string/timer_provider"
@@ -87,18 +89,6 @@
                 <action android:name="@string/action_tap" />
             </intent-filter>
         </activity>
-        -->
-
-        <!--
-        <receiver
-            android:name=".Receiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        -->
 
     </application>
 

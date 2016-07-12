@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/AppTheme"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TimerActivity"
+    tools:deviceIds="wear_round"
+    android:background="?android:attr/selectableItemBackgroundBorderless"
+    android:id="@+id/constraintLayout">
+
+    <org.dwallach.xstopwatchcomplication.StopwatchText
+        android:text="00:00.00"
+        android:id="@+id/digits"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toBottomOf="@+id/topIcon"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/resetButton"
+        android:layout_marginBottom="8dp"
+        tools:ignore="HardcodedText" />
+
+    <ImageView
+        android:id="@+id/topIcon"
+        android:background="@drawable/ic_sandwatch_selected"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+        tools:layout_constraintRight_creator="1" />
+
+    <ImageButton
+        android:background="@drawable/ripple"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/resetButton"
+        android:contentDescription="@string/reset_description"
+        app:layout_constraintRight_toLeftOf="@+id/setButton"
+        android:layout_marginRight="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        android:layout_marginBottom="40dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/setButton"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@drawable/ripple"
+        android:contentDescription="@string/edit_description"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+        android:layout_marginRight="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        android:layout_marginBottom="40dp" />
+
+    <ImageButton
+        android:background="@drawable/ripple"
+        android:src="@android:drawable/ic_media_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/playPauseButton"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:visibility="visible"
+        android:contentDescription="@string/play_description"
+        app:layout_constraintLeft_toRightOf="@+id/setButton"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        android:layout_marginBottom="40dp" />
+
+</android.support.constraint.ConstraintLayout>

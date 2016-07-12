@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationText
-import android.text.format.DateUtils
 import org.jetbrains.anko.*
 
 class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): SharedState(complicationId, prefs), AnkoLogger {
@@ -61,8 +60,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         super.click(context)
     }
 
-    fun setActivity(a: StopwatchActivity) {
-        activity = a
+    fun makeActive() {
         activeComplicationId = complicationId
     }
 
@@ -136,11 +134,9 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
     override fun toString(): String = "${super.toString()}, priorTime($priorTime), startTime($startTime)"
 
     companion object {
-        private var activity: StopwatchActivity? = null
         private var activeComplicationId: Int = -1
 
-        fun nukeActivity() {
-            activity = null
+        fun nukeActive() {
             activeComplicationId = -1
         }
     }

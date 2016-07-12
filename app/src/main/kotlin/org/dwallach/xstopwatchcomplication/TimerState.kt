@@ -46,9 +46,9 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     }
 
 
-    fun setDuration(context: Context, duration: Long) {
+    fun setDuration(duration: Long, context: Context? = null) {
         this.duration = duration
-        reset(context)
+        if(context != null) reset(context)
     }
 
     override fun reset(context: Context) {
@@ -88,6 +88,11 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         verbose("TODO: launch configuration activity")
     }
 
+    fun makeActive() {
+        activeComplicationId = complicationId
+    }
+
+
     override fun alarm(context: Context) {
         // four short buzzes within one second total time
         val vibratorPattern = longArrayOf(100, 200, 100, 200, 100, 200, 100, 200)
@@ -125,7 +130,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     private var pendingIntentCache: PendingIntent? = null
 
-    private fun getPendingIntent(context: Context): PendingIntent {
+    private fun getTimerCompleteAlarmIntent(context: Context): PendingIntent {
         val result = pendingIntentCache ?:
                 // Engineering note: we're using one Intent "action" per complication, each with its own
                 // action name. We could potentially make all the intents with the same action name and
@@ -145,11 +150,11 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
     private fun registerTimerCompleteAlarm(context: Context, wakeupTime: Long) {
         verbose { "registerTimerCompleteAlarm: wakeUp($wakeupTime)" }
 
-        context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, wakeupTime, getPendingIntent(context))
+        context.alarmManager.setExact(AlarmManager.RTC_WAKEUP, wakeupTime, getTimerCompleteAlarmIntent(context))
     }
 
     private fun deregisterTimerCompleteAlarm(context: Context) {
-        context.alarmManager.cancel(getPendingIntent(context))
+        context.alarmManager.cancel(getTimerCompleteAlarmIntent(context))
         pendingIntentCache = null
     }
 
@@ -158,7 +163,7 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
                 // TODO change to TimerActivity
-                context.intentFor<StopwatchActivity>(Constants.COMPLICATION_ID to complicationId)
+                context.intentFor<TimerActivity>(Constants.COMPLICATION_ID to complicationId)
                         .setAction(context.getString(R.string.action_tap)),
                 PendingIntent.FLAG_UPDATE_CURRENT)
     }
@@ -214,6 +219,16 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         get() = ComponentName.createRelative(Constants.PREFIX, ".TimerProviderService")
 
     override fun toString(): String = "${super.toString()} elapsedTime($elapsedTime), startTime($startTime), duration($duration)"
+
+    companion object {
+        private var activeComplicationId: Int = -1
+
+        fun nukeActive() {
+            activeComplicationId = -1
+        }
+
+        fun getActive(): TimerState? = SharedState[activeComplicationId] as TimerState?
+    }
 }
 
 /**

@@ -8,6 +8,7 @@
     <string name="action_reset">org.dwallach.xstopwatchcomplication.ACTION_RESET</string>
     <string name="action_configure">org.dwallach.xstopwatchcomplication.ACTION_CONFIGURE</string>
     <string name="title_activity_stopwatch">StopwatchActivity</string>
+    <string name="edit_description">Edit</string>
     <string name="play_description">Start/Stop</string>
     <string name="pause_description">Pause</string>
     <string name="reset_description">Reset</string>
