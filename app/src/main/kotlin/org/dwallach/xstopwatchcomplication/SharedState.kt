@@ -209,7 +209,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         }
 
         fun restoreEverything(context: Context) {
-            verbose("restoreEverything: necessary?($restoreNecessary)")
+            info("restoreEverything: necessary?($restoreNecessary)")
 
             if(!restoreNecessary) return
             restoreNecessary = false
@@ -226,9 +226,12 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
                     val typeString = getString("${Constants.PREFERENCES}.id$it${Constants.SUFFIX_TYPE}", "none")
                     when(typeString) {
                         Constants.TYPE_STOPWATCH -> StopwatchState(it, this).register(context)
-                        Constants.TYPE_TIMER -> Unit // TODO TimerState...
+                        Constants.TYPE_TIMER -> TimerState(it, this).register(context)
                         else -> error { "unknown complication type: id($it) type($typeString)" }
                     }
+                }
+                activeIds.forEach {
+                    SharedState[it]?.logState()
                 }
             }
         }
