@@ -52,7 +52,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
      * TODO: move back to this code and kill TimePickerFragment once they fix the bug in Wear
      */
-    class FailedTimePickerFragment() : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
+    class BuiltinTimePickerFragment(val stopwatchText: StopwatchText) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
         private lateinit var state: TimerState
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -65,21 +65,24 @@ class TimerActivity : WearableActivity(), AnkoLogger {
             val hour = (duration / 3600000).toInt()
 
             // Create a new instance of TimePickerDialog and return it
-            return TimePickerDialog(activity, R.style.Theme_Wearable_Modal, this, hour, minute, true)
+            return TimePickerDialog(activity,
+//                    R.style.Theme_Wearable_Modal,                  // this doesn't work -- gives everything white
+//                    AlertDialog.THEME_DEVICE_DEFAULT_DARK,         // this one is deprecated
+                    this, hour, minute, true)
         }
 
         override fun onTimeSet(view: TimePicker, hour: Int, minute: Int) {
             // Do something with the time chosen by the user
             verbose { "User selected time: %d:%02d".format(hour, minute) }
-            state.setDuration(hour * 3600000L + minute * 60000L)
-            digits.invalidate() // force redraw
+            state.setDuration(hour * 3600000L + minute * 60000L, activity)
+            stopwatchText.invalidate() // forces a redraw
         }
     }
 
     // call to this specified in the layout xml files
     fun showTimePickerDialog() =
-            TimePickerFragment().show(fragmentManager, "timePicker")
-//            FailedTimePickerFragment().show(fragmentManager, "timePicker")
+//            TimePickerFragment().show(fragmentManager, "timePicker")
+            BuiltinTimePickerFragment(digits).show(fragmentManager, "timePicker")
 
     // this one gets called if we already are running, but now get another message,
     // perhaps from a different complication

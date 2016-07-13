@@ -54,8 +54,8 @@ android {
         // these are currently 'N', which is an artifact of the weird roll-out of the Wear 2.0 Preview
         // but these will both be 24 once things stabilize. We don't intend this app to run on anything
         // earlier than Wear 2.0.
-        minSdkVersion 'N'
-        targetSdkVersion 'N'
+        minSdkVersion 24
+        targetSdkVersion 24
         versionCode getVersionCode()
         versionName getVersionName()
         vectorDrawables.useSupportLibrary = true
@@ -77,7 +77,7 @@ dependencies {
         provided 'com.google.android.wearable:wearable:1.0.0' // required per documentation
         // https://developer.android.com/training/wearables/apps/always-on.html
 
-    compile 'com.google.android.gms:play-services-wearable:9.2.0'
+    compile 'com.google.android.gms:play-services-wearable:9.2.1'
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'
     compile 'com.android.support:appcompat-v7:24.0.0'
