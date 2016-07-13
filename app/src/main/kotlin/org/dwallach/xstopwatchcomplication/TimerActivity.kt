@@ -41,10 +41,14 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
     /**
      * this uses the built-in TimePickerDialog to ask the user to specify the hours and minutes
-     * for the count-down timer. Of course, it works fine on the emulator and on a Moto360, but
-     * totally fails on the LG G Watch and G Watch R, apparently trying to show a full-blown
-     * Material Design awesome thing that was never tuned to fit on a watch. Instead, see
-     * the separate TimePickerFragment class, which might be ugly, but at least it works consistently.
+     * for the count-down timer. In Wear 1.0 and 1.5 / Android 4.4W and 5.0, TimePickerDialog was
+     * a Holo-style picker on some devices and a malformed Material-style picker on others (digits
+     * visible, but round selector wheel below the screen). Somewhere after this, it was the
+     * malformed Material-style picker for everybody. That's why we instead have our own
+     * [TimePickerFragment], which is another Holo-ish picker that I had to write.
+     *
+     * <p>In Wear 2.0 / Android N? Now it's just a huge white screen with an okay/cancel button
+     * at the bottom.
 
      * TODO: move back to this code and kill TimePickerFragment once they fix the bug in Wear
      */
@@ -74,10 +78,8 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
     // call to this specified in the layout xml files
     fun showTimePickerDialog() =
-            TimePickerFragment().show(fragmentManager, "timePicker")
-//        FailedTimePickerFragment().show(fragmentManager, "timePicker")
-
-
+//            TimePickerFragment().show(fragmentManager, "timePicker")
+            FailedTimePickerFragment().show(fragmentManager, "timePicker")
 
     // this one gets called if we already are running, but now get another message,
     // perhaps from a different complication
