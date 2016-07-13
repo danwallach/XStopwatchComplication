@@ -21,7 +21,8 @@
         app:layout_constraintTop_toBottomOf="@+id/topIcon"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/resetButton"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/topIcon"
