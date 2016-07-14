@@ -12,7 +12,6 @@ import android.widget.ImageButton
 import android.widget.TimePicker
 
 import kotlinx.android.synthetic.main.activity_timer.*
-import kotlinx.android.synthetic.main.rect_activity_stopwatch.*
 import org.jetbrains.anko.*
 
 class TimerActivity : WearableActivity(), AnkoLogger {
@@ -49,7 +48,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
      *
      * <p>In Wear 2.0 / Android N? Now it's just a huge white screen with an okay/cancel button
      * at the bottom.
-
+     *
      * TODO: move back to this code and kill TimePickerFragment once they fix the bug in Wear
      */
     class BuiltinTimePickerFragment(val stopwatchText: StopwatchText) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {

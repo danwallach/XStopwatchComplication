@@ -14,7 +14,6 @@ import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ProviderUpdateRequester
 import android.text.format.DateUtils
 import org.jetbrains.anko.*
-import org.jetbrains.anko.intentFor
 import java.util.*
 
 /**
@@ -39,12 +38,17 @@ fun String?.safeSplit(separator: String): List<String> =
  * We'll implement this abstract class for StopwatchState and TimerState.
  */
 abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): AnkoLogger {
-    var isRunning: Boolean = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RUNNING}", false)
+    var isRunning: Boolean
         protected set
-    var isReset: Boolean = prefs.getBoolean("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_RESET}", true)
+    var isReset: Boolean
         protected set
     var isVisible: Boolean = false // this is tweaked by StopwatchText
 
+    init {
+        val prefix = "${Constants.PREFERENCES}.id$complicationId"
+        isRunning = prefs.getBoolean("$prefix${Constants.SUFFIX_RUNNING}", false)
+        isReset= prefs.getBoolean("$prefix${Constants.SUFFIX_RESET}", true)
+    }
 
     open fun reset(context: Context) {
         verbose { "$type($complicationId) reset" }
@@ -195,7 +199,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).edit().apply {
                 val activeIds = SharedState.activeIds()
 
+                val buildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+
                 putInt(Constants.PREFERENCES+".version", Constants.PREFERENCES_VERSION)
+                putInt(Constants.PREFERENCES+".buildNumber", buildNumber)
                 putString(Constants.PREFERENCES+".activeIds", activeIds.joinToString(","))
 
                 activeIds.forEach {
@@ -214,13 +221,21 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
             if(!restoreNecessary) return
             restoreNecessary = false
 
+            val currentBuildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).apply {
                 val version = getInt(Constants.PREFERENCES+".version", 1)
+                val savedBuildNumber = getInt(Constants.PREFERENCES+".buildNumber", 1)
                 val activeIds = getString(Constants.PREFERENCES+".activeIds", "")
                         .safeSplit(",")
                         .map { it.toInt() }
 
-                verbose("restoreEverything: version($version), activeIds(${activeIds.joinToString(",")}")
+                verbose("restoreEverything: version($version), buildNumber($savedBuildNumber), activeIds(${activeIds.joinToString(",")}")
+
+                if(version != Constants.PREFERENCES_VERSION || currentBuildNumber != savedBuildNumber) {
+                    info { "Old version detected, starting from scratch" }
+                    return
+                }
 
                 activeIds.forEach {
                     val typeString = getString("${Constants.PREFERENCES}.id$it${Constants.SUFFIX_TYPE}", "none")
