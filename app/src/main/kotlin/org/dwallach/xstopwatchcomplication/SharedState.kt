@@ -111,9 +111,9 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
     }
 
     open fun logState() {
-        verbose { "id$complicationId.${Constants.SUFFIX_RUNNING}: ${isRunning}" }
-        verbose { "id$complicationId.${Constants.SUFFIX_RESET}: ${isReset}" }
-        verbose { "id$complicationId.${Constants.SUFFIX_TYPE}: ${type}" }
+        verbose { "id$complicationId.${Constants.SUFFIX_RUNNING}: $isRunning" }
+        verbose { "id$complicationId.${Constants.SUFFIX_RESET}: $isReset" }
+        verbose { "id$complicationId.${Constants.SUFFIX_TYPE}: $type" }
     }
 
     /**
@@ -176,6 +176,8 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
         protected val stateRegistry: MutableMap<Int,SharedState> = HashMap()
         private var restoreNecessary: Boolean = true // starts off true, set false once we've restored
 
+        override val loggerTag = "SharedState" // more useful than "Companion"
+
 
         /**
          * Fetch the shared state for a given complication. Results might be null
@@ -187,11 +189,6 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
          * Returns a set of all IDs currently known to be active.
          */
         fun activeIds() = stateRegistry.keys
-
-        /**
-         * Returns a set of all SharedStates currently known to be active.
-         */
-        fun activeStates() = stateRegistry.values
 
         fun saveEverything(context: Context) {
             info("saveEverything")

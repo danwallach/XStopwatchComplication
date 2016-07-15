@@ -42,6 +42,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
      */
     class BuiltinTimePickerFragment(val stopwatchText: StopwatchText? = null) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
         private lateinit var state: TimerState
+        override val loggerTag = "TimerActivity"
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             // Use the current time as the default values for the picker

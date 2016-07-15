@@ -43,6 +43,8 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         var singletonService: NotificationService? = null
         private set
 
+        override val loggerTag = "NotificationService" // more useful than "Companion"
+
         /**
          * Start the notification service, if it's not already running. This is the service
          * that waits for alarms, when a timer runs out. By having it running, we'll also
@@ -68,8 +70,9 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         fun handleIntent(intent: Intent) {
             val action = intent.action
             val context = singletonService
+            val complicationId = intent.getIntExtra("complicationId", -1)
 
-            info { "onHandleIntent: action($action)" }
+            info { "onHandleIntent: action($action), complicationId($complicationId)" }
 
             if(action == Intent.ACTION_DEFAULT || action == Intent.ACTION_BOOT_COMPLETED) {
                 info("kickstart launch, we're good to go")
@@ -81,12 +84,12 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
                 return
             }
 
-            val complicationId = intent.getIntExtra("complicationId", -1)
-            val complicationState = SharedState[complicationId]
-
-            if(complicationState == null) {
+            val complicationState = SharedState[complicationId] ?:
                 errorLogAndThrow("no state to handle intent action($action) for complicationId($complicationId)")
-            }
+
+            // paranoia
+            if(complicationState.complicationId != complicationId)
+                errorLogAndThrow("DB corruption: found complication with id(${complicationState.complicationId}, not $complicationId")
 
             when(action) {
                 actionTimerComplete -> complicationState.alarm(context)

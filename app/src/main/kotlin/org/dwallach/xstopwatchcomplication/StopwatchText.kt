@@ -146,11 +146,12 @@ class StopwatchText : View, AnkoLogger {
         // TODO add ambient mode
     }
 
-    companion object {
+    companion object: AnkoLogger {
         const val MSG_UPDATE_TIME = 0
 
         private class MyHandler internal constructor(stopwatchText: StopwatchText) : Handler(), AnkoLogger {
             private val stopwatchTextRef = WeakReference(stopwatchText)
+            override val loggerTag = "StopwatchText" // more useful than "Companion"
 
             override fun handleMessage(message: Message) {
                 val stopwatchText = stopwatchTextRef.get() ?: return

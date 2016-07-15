@@ -1,3 +1,4 @@
+adb shell setprop log.tag.Companion VERBOSE
 adb shell setprop log.tag.Constants VERBOSE
 adb shell setprop log.tag.NotificationHelper VERBOSE
 adb shell setprop log.tag.NotificationService VERBOSE
