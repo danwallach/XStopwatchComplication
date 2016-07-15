@@ -40,23 +40,15 @@ class TimerProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
         debug { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
 
-        val state = SharedState[complicationId]
-        if(state == null) {
-            error { "No timer complication found for id# $complicationId" }
-            return
-        }
+        val state = SharedState[complicationId] ?:
+            errorLogAndThrow("No timer complication found for id# $complicationId")
 
         if(state !is TimerState) {
-            error { "complicationId($complicationId) wasn't a timer!" }
-            return
+            errorLogAndThrow("complicationId($complicationId) wasn't a timer!")
         }
 
-        val tapPendingIntent: PendingIntent? = state.tapComplicationPendingIntent
-
-        if(tapPendingIntent == null) {
-            error { "complicationId($complicationId) missing a tapPendingIntent!" }
-            return
-        }
+        val tapPendingIntent: PendingIntent = state.tapComplicationPendingIntent ?:
+            errorLogAndThrow("complicationId($complicationId) missing a tapPendingIntent!")
 
         val data = when (complicationType) {
             ComplicationData.TYPE_ICON ->

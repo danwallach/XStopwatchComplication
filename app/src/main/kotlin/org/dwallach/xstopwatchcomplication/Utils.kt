@@ -1,6 +1,8 @@
 package org.dwallach.xstopwatchcomplication
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.support.wearable.complications.ComplicationText
 import org.jetbrains.anko.*
 
@@ -25,5 +27,18 @@ fun AnkoLogger.logIntent(intent: Intent) {
 
     intent.extras?.keySet()?.forEach {
         info { "--- found extra: $it -> ${intent.extras[it].toString()}" }
+    }
+}
+
+fun AnkoLogger.logBuildVersion(context: Context) {
+    try {
+        val pinfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        val versionNumber = pinfo.versionCode
+        val versionName = pinfo.versionName
+
+        info { "Version: $versionName ($versionNumber)" }
+
+    } catch (e: PackageManager.NameNotFoundException) {
+        error("couldn't read version", e)
     }
 }

@@ -6,7 +6,6 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.*
 import org.jetbrains.anko.*
@@ -40,20 +39,14 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
     override fun onComplicationUpdate(complicationId: Int, complicationType: Int, complicationManager: ComplicationManager) {
         info { "onComplicationUpdate: complicationId($complicationId), complicationType($complicationType)" }
 
-        val state = SharedState[complicationId]
-        if(state == null) {
-            errorLogAndThrow("No stopwatch complication found for id# $complicationId")
-        }
+        val state = SharedState[complicationId] ?: errorLogAndThrow("No stopwatch complication found for id# $complicationId")
 
         if(state !is StopwatchState) {
             errorLogAndThrow("complicationId($complicationId) wasn't a stopwatch!")
         }
 
-        val tapPendingIntent: PendingIntent? = state.tapComplicationPendingIntent
-
-        if(tapPendingIntent == null) {
+        val tapPendingIntent: PendingIntent = state.tapComplicationPendingIntent ?:
             errorLogAndThrow("complicationId($complicationId) missing a tapPendingIntent!")
-        }
 
         val data = when (complicationType) {
             ComplicationData.TYPE_ICON ->
@@ -114,9 +107,5 @@ class StopwatchProviderService: ComplicationProviderService(), AnkoLogger {
         super.onDestroy()
         // we're only doing this so we can log when we get destroyed, which will help us debug things
         info("onDestroy")
-    }
-
-    companion object {
-        val componentName = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderService")
     }
 }

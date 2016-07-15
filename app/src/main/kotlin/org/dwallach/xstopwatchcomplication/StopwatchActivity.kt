@@ -1,7 +1,6 @@
 package org.dwallach.xstopwatchcomplication
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.widget.ImageButton
@@ -18,17 +17,7 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
 
         info("onCreate")
-
-        try {
-            val pinfo = packageManager.getPackageInfo(packageName, 0)
-            val versionNumber = pinfo.versionCode
-            val versionName = pinfo.versionName
-
-            info { "Version: $versionName ($versionNumber)" }
-
-        } catch (e: PackageManager.NameNotFoundException) {
-            error("couldn't read version", e)
-        }
+        logBuildVersion(this)
 
         createInternal(intent)
     }

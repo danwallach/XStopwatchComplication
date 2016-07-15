@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.app.DialogFragment
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.AlarmClock
 import android.support.wearable.activity.WearableActivity
@@ -23,17 +22,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
 
         verbose("onCreate")
-
-        try {
-            val pinfo = packageManager.getPackageInfo(packageName, 0)
-            val versionNumber = pinfo.versionCode
-            val versionName = pinfo.versionName
-
-            info { "Version: $versionName ($versionNumber)" }
-
-        } catch (e: PackageManager.NameNotFoundException) {
-            error("couldn't read version", e)
-        }
+        logBuildVersion(this)
 
         createInternal(intent)
     }
@@ -51,7 +40,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
      *
      * TODO: move back to this code and kill TimePickerFragment once they fix the bug in Wear
      */
-    class BuiltinTimePickerFragment(val stopwatchText: StopwatchText) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
+    class BuiltinTimePickerFragment(val stopwatchText: StopwatchText? = null) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
         private lateinit var state: TimerState
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -74,7 +63,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
             // Do something with the time chosen by the user
             verbose { "User selected time: %d:%02d".format(hour, minute) }
             state.setDuration(hour * 3600000L + minute * 60000L, activity)
-            stopwatchText.invalidate() // forces a redraw
+            stopwatchText?.invalidate() // forces a redraw
         }
     }
 
