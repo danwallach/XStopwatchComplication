@@ -196,7 +196,7 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
             context.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE).edit().apply {
                 val activeIds = SharedState.activeIds()
 
-                val buildNumber = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+                val buildNumber = context.buildNumber
 
                 putInt(Constants.PREFERENCES+".version", Constants.PREFERENCES_VERSION)
                 putInt(Constants.PREFERENCES+".buildNumber", buildNumber)

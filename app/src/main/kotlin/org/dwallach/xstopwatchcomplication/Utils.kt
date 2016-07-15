@@ -32,13 +32,15 @@ fun AnkoLogger.logIntent(intent: Intent) {
 
 fun AnkoLogger.logBuildVersion(context: Context) {
     try {
-        val pinfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val versionNumber = pinfo.versionCode
-        val versionName = pinfo.versionName
-
-        info { "Version: $versionName ($versionNumber)" }
+        info { "Version: ${context.buildName} (${context.buildNumber})" }
 
     } catch (e: PackageManager.NameNotFoundException) {
         error("couldn't read version", e)
     }
 }
+
+val Context.buildName: String
+    get() = packageManager.getPackageInfo(packageName, 0).versionName
+
+val Context.buildNumber: Int
+  get() = packageManager.getPackageInfo(packageName, 0).versionCode
