@@ -11,13 +11,14 @@ Finish stopwatch
     TODO 60hz animation, crawl progress bar thing on 60-sec schedule?
 
     TODO support for multiple concurrent stopwatches / multiple concurrent timers?
+      Looks like we're getting back inconsistent intents from the watchface
 
 Add timer support
 
     DONE? build layout for timer activity
       DONE? activity listed in manifest
-      TODO time picker fragment
-        TODO verify whether Wear 2.0 has a time picker that actually works
+      DONE? time picker fragment
+        DONE? verify whether Wear 2.0 has a time picker that actually works
 	  DONE? "Ok Google, start a 10 minute timer" -- requires an activity?
 	  DONE? port over all the changes from Stopwatch
 
@@ -36,7 +37,7 @@ Ambient/Always-On
     TODO use alarm manager for 1 Hz updates vs. current use of Handler
 
 "Ok Google" Intents
-    TODO register and deregister for these intents based on whether or not we're set as a complication?
+    DONE? register and deregister for these intents based on whether or not we're set as a complication?
 
 
 Proguard
