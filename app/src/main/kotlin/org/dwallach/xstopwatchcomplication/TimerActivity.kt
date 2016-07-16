@@ -75,9 +75,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
     }
 
     // call to this specified in the layout xml files
-    fun showTimePickerDialog() =
-//            TimePickerFragment().show(fragmentManager, "timePicker")
-            BuiltinTimePickerFragment(digits).show(fragmentManager, "timePicker")
+    fun showTimePickerDialog() = BuiltinTimePickerFragment(digits).show(fragmentManager, "timePicker")
 
     // this one gets called if we already are running, but now get another message,
     // perhaps from a different complication
