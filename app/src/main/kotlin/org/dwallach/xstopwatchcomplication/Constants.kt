@@ -29,5 +29,5 @@ object Constants {
     const val TIMER_DEFAULT_VALUE = 600000L // 10 minutes in milliseconds
 
     // used for intent
-    const val COMPLICATION_ID = "complicationId"
+    const val COMPLICATION_ID = "xComplicationId"
 }

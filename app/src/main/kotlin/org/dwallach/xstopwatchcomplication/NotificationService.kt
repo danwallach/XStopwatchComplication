@@ -70,7 +70,7 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         fun handleIntent(intent: Intent) {
             val action = intent.action
             val context = singletonService
-            val complicationId = intent.getIntExtra("complicationId", -1)
+            val complicationId = intent.getIntExtra(Constants.COMPLICATION_ID, -1)
 
             info { "onHandleIntent: action($action), complicationId($complicationId)" }
 
