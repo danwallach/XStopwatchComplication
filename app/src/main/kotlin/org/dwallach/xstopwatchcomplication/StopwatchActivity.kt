@@ -42,8 +42,6 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
         info("createInternal")
         logIntent(intent)
 
-        StopwatchState.nukeActive() // more paranoia
-
         val actionTap = getString(R.string.action_tap)
 
         // if the user said "OK Google, start stopwatch", then this is how we can tell
@@ -95,7 +93,6 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
 
             // now that we've loaded the state, we know whether we're playing or paused
             setPlayButtonIcon()
-            lState.makeActive()
             digits.setSharedState(lState)
 
             digits.restartRedrawLoop()
@@ -137,8 +134,6 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
 
     override fun onDestroy() {
         info("onDestroy")
-
-        StopwatchState.nukeActive()
 
         super.onDestroy()
     }

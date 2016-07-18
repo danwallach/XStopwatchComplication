@@ -94,11 +94,6 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         updateBuzzTimer(context)
     }
 
-    fun makeActive() {
-        activeComplicationId = complicationId
-    }
-
-
     override fun alarm(context: Context) {
         // four short buzzes within one second total time
         val vibratorPattern = longArrayOf(100, 200, 100, 200, 100, 200, 100, 200)
@@ -228,16 +223,6 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
         get() = ComponentName.createRelative(Constants.PREFIX, ".TimerProviderService")
 
     override fun toString(): String = "${super.toString()} elapsedTime($elapsedTime), startTime($startTime), duration($duration)"
-
-    companion object {
-        private var activeComplicationId: Int = -1
-
-        fun nukeActive() {
-            activeComplicationId = -1
-        }
-
-        fun getActive(): TimerState? = SharedState[activeComplicationId] as TimerState?
-    }
 }
 
 /**

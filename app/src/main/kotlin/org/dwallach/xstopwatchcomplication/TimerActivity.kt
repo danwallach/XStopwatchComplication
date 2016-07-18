@@ -46,15 +46,13 @@ class TimerActivity : WearableActivity(), AnkoLogger {
      *
      * TODO: move back to this code and kill TimePickerFragment once they fix the bug in Wear
      */
-    class BuiltinTimePickerFragment(val stopwatchText: StopwatchText? = null) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
-        private lateinit var state: TimerState
+    class BuiltinTimePickerFragment(val state: TimerState? = null, val stopwatchText: StopwatchText? = null) : DialogFragment(), TimePickerDialog.OnTimeSetListener, AnkoLogger {
         override val loggerTag = "TimerActivity"
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            if(state == null) errorLogAndThrow("need an active time state for dialog")
+
             // Use the current time as the default values for the picker
-
-            state = TimerState.getActive() ?: errorLogAndThrow("need an active tme state for dialog")
-
             val duration = state.duration // in milliseconds
             val minute = (duration / 60000 % 60).toInt()
             val hour = (duration / 3600000).toInt()
@@ -67,6 +65,8 @@ class TimerActivity : WearableActivity(), AnkoLogger {
         }
 
         override fun onTimeSet(view: TimePicker, hour: Int, minute: Int) {
+            if(state == null) errorLogAndThrow("need an active time state for dialog")
+
             // Do something with the time chosen by the user
             verbose { "User selected time: %d:%02d".format(hour, minute) }
             state.setDuration(hour * 3600000L + minute * 60000L, activity)
@@ -75,7 +75,7 @@ class TimerActivity : WearableActivity(), AnkoLogger {
     }
 
     // call to this specified in the layout xml files
-    fun showTimePickerDialog() = BuiltinTimePickerFragment(digits).show(fragmentManager, "timePicker")
+    fun showTimePickerDialog() = BuiltinTimePickerFragment(state, digits).show(fragmentManager, "timePicker")
 
     // this one gets called if we already are running, but now get another message,
     // perhaps from a different complication
@@ -90,8 +90,6 @@ class TimerActivity : WearableActivity(), AnkoLogger {
     private fun createInternal(intent: Intent) {
         verbose("createInternal")
         logIntent(intent)
-
-        TimerState.nukeActive() // more paranoia
 
         val actionTap = getString(R.string.action_tap)
 
@@ -151,7 +149,6 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
             // now that we've loaded the state, we know whether we're playing or paused
             setPlayButtonIcon()
-            lState.makeActive()
             digits.setSharedState(lState)
 
             digits.restartRedrawLoop()
@@ -198,8 +195,6 @@ class TimerActivity : WearableActivity(), AnkoLogger {
 
     override fun onDestroy() {
         verbose("onDestroy")
-
-        TimerState.nukeActive()
 
         super.onDestroy()
     }

@@ -22,11 +22,7 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         private set
 
     /**
-     * subtract this from the start time to know how long it's been running
-     */
-
-    /**
-     * when the stopwatch started running (GMT)
+     * subtract this from the start time to know how long it's been running (when the stopwatch started running (GMT))
      */
     var startTime = prefs.getLong("${Constants.PREFERENCES}.id$complicationId${Constants.SUFFIX_START_TIME}", 0)
         private set
@@ -66,10 +62,6 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         }
 
         super.click(context)
-    }
-
-    fun makeActive() {
-        activeComplicationId = complicationId
     }
 
     override fun pause(context: Context) {
@@ -141,14 +133,6 @@ class StopwatchState(complicationId: Int, prefs: SharedPreferences? = null): Sha
         get() = ComponentName.createRelative(Constants.PREFIX, ".StopwatchProviderService")
 
     override fun toString(): String = "${super.toString()}, priorTime($priorTime), startTime($startTime)"
-
-    companion object {
-        private var activeComplicationId: Int = -1
-
-        fun nukeActive() {
-            activeComplicationId = -1
-        }
-    }
 }
 
 /**
