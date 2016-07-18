@@ -141,11 +141,6 @@ class TimerState(complicationId: Int, prefs: SharedPreferences? = null): SharedS
 
     private fun getTimerCompleteAlarmIntent(context: Context): PendingIntent {
         val result = pendingIntentCache ?:
-                // Engineering note: we're using one Intent "action" per complication, each with its own
-                // action name. We could potentially make all the intents with the same action name and
-                // instead use extras for the complicationId.
-
-                // TODO should we instead use one action? Would that work?
                 PendingIntent.getService(context, 0,
                         context.intentFor<NotificationService>(Constants.COMPLICATION_ID to complicationId)
                                 .setAction(context.getString(R.string.action_timer_complete)),

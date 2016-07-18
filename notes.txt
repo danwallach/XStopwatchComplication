@@ -10,8 +10,8 @@ Finish stopwatch
     TODO ripples don't go away?!
     TODO 60hz animation, crawl progress bar thing on 60-sec schedule?
 
-    TODO support for multiple concurrent stopwatches / multiple concurrent timers?
-      Looks like we're getting back inconsistent intents from the watchface
+    Support for multiple concurrent stopwatches / multiple concurrent timers?
+      TODO Looks like we're getting back inconsistent intents from the watchface
 
 Add timer support
 
@@ -24,8 +24,8 @@ Add timer support
 
 Lifecyle goodies
     Two sorts of services: NotificationService and *ProviderService; both now will restore state, if necessary
-    TODO who actually gets killed when?
-    TODO verify that notification update pipeline (which roundtrips with the watchface) actually works
+    DONE? who actually gets killed when?
+    DONE? verify that notification update pipeline (which roundtrips with the watchface) actually works
 
 i18n/l10n
     TODO bug friends again for i18n text
