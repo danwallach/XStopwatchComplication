@@ -25,6 +25,8 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         super.onCreate()
         info("onCreate")
 
+        if(singletonService == null) singletonService = this // in case we somehow got here without kickstarting
+
         actionTimerComplete = getString(R.string.action_timer_complete)
         actionTap = getString(R.string.action_tap)
 
@@ -37,19 +39,22 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         info("onDestroy")
     }
 
-    override fun onHandleIntent(intent: Intent) = handleIntent(intent)
+    override fun onHandleIntent(intent: Intent) {
+        if(singletonService == null) singletonService = this // in case we somehow got here without kickstarting
+
+        handleIntent(intent)
+    }
 
     companion object: AnkoLogger {
         var singletonService: NotificationService? = null
-        private set
+            private set
 
         override val loggerTag = "NotificationService" // more useful than "Companion"
 
         /**
          * Start the notification service, if it's not already running. This is the service
          * that waits for alarms, when a timer runs out. By having it running, we'll also
-         * be around for broadcast intents, supporting all the communication goodness in
-         * Receiver
+         * be around for broadcast intents, but it's the alarms that matter here.
          */
         fun kickStart(context: Context) {
             if (singletonService == null) {
@@ -85,7 +90,7 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
             }
 
             val complicationState = SharedState[complicationId] ?:
-                errorLogAndThrow("no state to handle intent action($action) for complicationId($complicationId)")
+                    errorLogAndThrow("no state to handle intent action($action) for complicationId($complicationId)")
 
             // paranoia
             if(complicationState.complicationId != complicationId)
