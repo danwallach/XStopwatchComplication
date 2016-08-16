@@ -77,10 +77,10 @@ dependencies {
         provided 'com.google.android.wearable:wearable:1.0.0' // required per documentation
         // https://developer.android.com/training/wearables/apps/always-on.html
 
-    compile 'com.google.android.gms:play-services-wearable:9.2.1'
+    compile 'com.google.android.gms:play-services-wearable:9.4.0'
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'
-    compile 'com.android.support:appcompat-v7:24.1.0'
+    compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha4' // because fun!
 
     compile "org.jetbrains.anko:anko-sdk15:$anko_version"
