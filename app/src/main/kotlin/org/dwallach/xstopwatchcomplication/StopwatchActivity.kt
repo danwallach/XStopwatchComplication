@@ -62,12 +62,13 @@ class StopwatchActivity : WearableActivity(), AnkoLogger {
                     return
                 }
 
-                state?.run(this)
+                lState.run(this)
+                state = lState
                 launchStopwatch()
             }
             actionTap -> {
-                info("we were tapped, presumably from the watchface!")
                 val complicationId = intent.extras.getInt(Constants.COMPLICATION_ID, -1)
+                info { "we were tapped, presumably from the watchface!, complicationId($complicationId)" }
                 state = SharedState[complicationId] as StopwatchState?
                 launchStopwatch()
             }
