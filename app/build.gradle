@@ -47,15 +47,15 @@ buildscript {
 
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.0'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "org.dwallach.xstopwatchcomplication"
         // these are currently 'N', which is an artifact of the weird roll-out of the Wear 2.0 Preview
         // but these will both be 24 once things stabilize. We don't intend this app to run on anything
         // earlier than Wear 2.0.
-        minSdkVersion 24
-        targetSdkVersion 24
+        minSdkVersion 25
+        targetSdkVersion 25
         versionCode getVersionCode()
         versionName getVersionName()
         vectorDrawables.useSupportLibrary = true
@@ -77,10 +77,10 @@ dependencies {
         provided 'com.google.android.wearable:wearable:1.0.0' // required per documentation
         // https://developer.android.com/training/wearables/apps/always-on.html
 
-    compile 'com.google.android.gms:play-services-wearable:9.4.0'
+    compile 'com.google.android.gms:play-services-wearable:10.0.1'
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'
-    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha4' // because fun!
 
     compile "org.jetbrains.anko:anko-sdk15:$anko_version"
