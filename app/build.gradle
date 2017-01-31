@@ -48,12 +48,9 @@ buildscript {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "org.dwallach.xstopwatchcomplication"
-        // these are currently 'N', which is an artifact of the weird roll-out of the Wear 2.0 Preview
-        // but these will both be 24 once things stabilize. We don't intend this app to run on anything
-        // earlier than Wear 2.0.
         minSdkVersion 25
         targetSdkVersion 25
         versionCode getVersionCode()
@@ -73,7 +70,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.support:wearable:2.0.0-alpha1'
+    compile 'com.google.android.support:wearable:2.0.0-beta2'
         provided 'com.google.android.wearable:wearable:1.0.0' // required per documentation
         // https://developer.android.com/training/wearables/apps/always-on.html
 
@@ -81,7 +78,7 @@ dependencies {
 //    compile 'com.android.support:palette-v7:24.0.0'
 //    compile 'com.android.support:support-v13:24.0.0'
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha4' // because fun!
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4' // because fun!
 
     compile "org.jetbrains.anko:anko-sdk15:$anko_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
