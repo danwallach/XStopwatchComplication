@@ -75,9 +75,10 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
         fun handleIntent(intent: Intent) {
             val action = intent.action
             val context = singletonService
+            val data = intent.dataString
             val complicationId = intent.getIntExtra(Constants.COMPLICATION_ID, -1)
 
-            info { "onHandleIntent: action($action), complicationId($complicationId)" }
+            info { "onHandleIntent: action($action), complicationId($complicationId), data($data)" }
 
             if(action == Intent.ACTION_DEFAULT || action == Intent.ACTION_BOOT_COMPLETED) {
                 info("kickstart launch, we're good to go")

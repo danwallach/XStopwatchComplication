@@ -10,6 +10,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ProviderUpdateRequester
 import android.text.format.DateUtils
@@ -145,7 +146,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
 
         tapComplicationPendingIntent = PendingIntent.getService(context, 0,
                 context.intentFor<NotificationService>(Constants.COMPLICATION_ID to complicationId)
-                        .setAction(context.getString(R.string.action_tap)),
+                        .setAction(context.getString(R.string.action_tap))
+                        // fun fact: intents ignore "extras" with regard to equality testing, so we need
+                        // to add a Uri in the "data" portion, even though we're going to ignore it later
+                        .setData(Uri.parse("content://org.dwallach.xstopwatchcomplication/tap/$complicationId")),
                 PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
