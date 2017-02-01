@@ -90,8 +90,14 @@ class NotificationService : IntentService("NotificationService"), AnkoLogger {
                 return
             }
 
-            val complicationState = SharedState[complicationId] ?:
-                    errorLogAndThrow("no state to handle intent action($action) for complicationId($complicationId)")
+
+            val complicationState = SharedState[complicationId]
+
+            if (complicationState == null) {
+                // this happens if we've updated and the build versions don't match
+                error { "no state to handle intent action($action) for complicationId($complicationId)" }
+                return
+            }
 
             // paranoia
             if(complicationState.complicationId != complicationId)

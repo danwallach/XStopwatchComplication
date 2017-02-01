@@ -30,7 +30,7 @@ Lifecyle goodies
     DONE? who actually gets killed when?
     DONE? verify that notification update pipeline (which roundtrips with the watchface) actually works
 
-    TODO icon on initial complication selector is enormous: fix!
+    DONE! icon on initial complication selector is enormous
 
 i18n/l10n
     TODO bug friends again for i18n text

@@ -234,9 +234,10 @@ abstract class SharedState(val complicationId: Int, prefs: SharedPreferences?): 
                 verbose("restoreEverything: version($version), buildNumber($savedBuildNumber), activeIds(${activeIds.joinToString(",")}")
 
                 if(version != Constants.PREFERENCES_VERSION || currentBuildNumber != savedBuildNumber) {
-                    info { "Old version detected, starting from scratch" }
-                    return
+                    warn { "Old version detected, restoration might be flakey" }
                 }
+
+                // if we ever change the save/restore format, then this will get more complicated than it is now!
 
                 activeIds.forEach {
                     val typeString = getString("${Constants.PREFERENCES}.id$it${Constants.SUFFIX_TYPE}", "none")
