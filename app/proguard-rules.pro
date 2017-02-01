@@ -21,4 +21,14 @@
 
 -dontwarn kotlin.**
 
+# painful hack per http://stackoverflow.com/questions/23883028/how-to-fix-proguard-warning-cant-find-referenced-method-for-existing-methods
+# which, naturally, doesn't even solve the problem
+# -keepnames class ** { *; }
+# -keepnames interface ** { *; }
+# -keepnames enum ** { *; }
+
+# hackery to work arouond version mismatch issues between Anko and the Android library
+# See, e.g.,: https://github.com/stephanenicolas/robospice/issues/437
+-dontwarn org.jetbrains.anko.internals.AnkoInternals
+
 -dontobfuscate

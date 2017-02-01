@@ -82,6 +82,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4' // because fun!
 
-    compile "org.jetbrains.anko:anko-sdk15:$anko_version"
+    compile "org.jetbrains.anko:anko-sdk23:$anko_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
