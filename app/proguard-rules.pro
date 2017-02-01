@@ -15,3 +15,10 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep public class org.dwallach.** { *; }
+-keep public class kotlin.reflect.** { *; }
+
+-dontwarn kotlin.**
+
+-dontobfuscate
