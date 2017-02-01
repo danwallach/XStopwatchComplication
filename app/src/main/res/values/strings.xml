@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">X-Complications</string>
+    <string name="app_name">XStopwatch/Timer</string>
     <string name="stopwatch_provider">Stopwatch</string>
     <string name="timer_provider">Timer</string>
     <string name="action_timer_complete">org.dwallach.xstopwatchcomplication.timer.ACTION_TIMER_COMPLETE</string>
