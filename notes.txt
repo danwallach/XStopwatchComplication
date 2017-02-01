@@ -7,13 +7,16 @@ Finish stopwatch
       DONE? only one at a time: infrastructure to kill the old ones!
   	  DONE? "Ok Google, start stopwatch"
 
-    TODO ripples don't go away?!
     TODO 60hz animation, crawl progress bar thing on 60-sec schedule?
 
     Support for multiple concurrent stopwatches / multiple concurrent timers?
       DONE! Looks like we're getting back inconsistent intents from the watchface
 
     DONE! Weird issues with wide/short text: should we say "short only"?
+
+    TODO layout looks ugly on a square watchface
+
+    TODO imagery/artwork for Play Store upload
 
 
 Add timer support
@@ -32,21 +35,11 @@ Lifecyle goodies
 
     DONE! icon on initial complication selector is enormous
 
-i18n/l10n
-    TODO bug friends again for i18n text
-    TODO RTOL support?
-
-Ambient/Always-On
-    https://developer.android.com/training/wearables/apps/always-on.html
-    TODO detect ambient / etc. modes
-    TODO use alarm manager for 1 Hz updates vs. current use of Handler
-
 "Ok Google" Intents
     DONE? register and deregister for these intents based on whether or not we're set as a complication?
 
-
 Proguard
-    TODO: If this library is passed through proguard optimization, make sure to add the com.google.android.wearable:wearable jar to the list of proguard library jars. Using gradle this can be accomplished by adding the following dependency line:
+    DONE: If this library is passed through proguard optimization, make sure to add the com.google.android.wearable:wearable jar to the list of proguard library jars. Using gradle this can be accomplished by adding the following dependency line:
          dependencies {
              provided 'com.google.android.wearable:wearable:1.0+'
          }
