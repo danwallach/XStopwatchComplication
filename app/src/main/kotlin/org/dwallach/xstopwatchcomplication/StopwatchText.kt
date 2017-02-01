@@ -66,6 +66,7 @@ class StopwatchText : View, AnkoLogger {
 
 
     fun setSharedState(sharedState: SharedState) {
+        verbose { "setting sharedState: $sharedState"}
         this.state = sharedState
         this.shortName = sharedState.shortName
     }

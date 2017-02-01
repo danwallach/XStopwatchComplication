@@ -45,3 +45,15 @@ Proguard
          dependencies {
              provided 'com.google.android.wearable:wearable:1.0+'
          }
+
+
+Verbose logging for all the things
+    setprop log.tag.SharedState VERBOSE
+    setprop log.tag.StopwatchActivity VERBOSE
+    setprop log.tag.StopwatchState VERBOSE
+    setprop log.tag.StopwatchProviderServic VERBOSE
+    setprop log.tag.StopwatchText VERBOSE
+    setprop log.tag.TimerActivity VERBOSE
+    setprop log.tag.TimerState VERBOSE
+    setprop log.tag.TimerProviderService VERBOSE
+
