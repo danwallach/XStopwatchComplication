@@ -86,7 +86,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="@org.dwallach.xstopwatchcomplication.ACTION_TAP" />
+                <action android:name="org.dwallach.xstopwatchcomplication.ACTION_TAP" />
             </intent-filter>
         </activity>
 
