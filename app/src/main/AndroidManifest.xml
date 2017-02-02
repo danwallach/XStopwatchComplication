@@ -43,7 +43,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="@string/action_tap" />
+                <action android:name="org.dwallach.xstopwatchcomplication.ACTION_TAP" />
             </intent-filter>
         </activity>
 
@@ -70,10 +70,10 @@
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="@string/action_timer_complete" />
+                <action android:name="org.dwallach.xstopwatchcomplication.timer.ACTION_TIMER_COMPLETE" />
             </intent-filter>
             <intent-filter>
-                <action android:name="@string/action_tap" />
+                <action android:name="org.dwallach.xstopwatchcomplication.ACTION_TAP" />
             </intent-filter>
         </service>
 
@@ -86,7 +86,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="@string/action_tap" />
+                <action android:name="@org.dwallach.xstopwatchcomplication.ACTION_TAP" />
             </intent-filter>
         </activity>
 
