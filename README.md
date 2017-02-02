@@ -1,4 +1,4 @@
-# XStopwatch and Timer Complications
+# X-Stopwatch and Timer Complications
 
 This is a pair of complications for Android Wear 2.0, installed as a single app. Multiple
 instances of each may be active simultaneously. Once you
