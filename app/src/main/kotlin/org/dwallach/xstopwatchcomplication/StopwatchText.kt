@@ -34,7 +34,6 @@ class StopwatchText : View, AnkoLogger {
     private var state: SharedState? = null
     private var shortName: String? = null
     private val textPaint: Paint
-    private val textPaintAmbient: Paint
 
     /** Handler to update the time once a second in interactive mode. */
     private val updateTimeHandler: MyHandler
@@ -49,14 +48,6 @@ class StopwatchText : View, AnkoLogger {
             isAntiAlias = true
             style = Paint.Style.FILL
             color = context.getColor(R.color.primary)
-            textAlign = Paint.Align.CENTER
-            typeface = Typeface.MONOSPACE
-        }
-
-        textPaintAmbient = Paint(Paint.SUBPIXEL_TEXT_FLAG or Paint.HINTING_ON).apply {
-            isAntiAlias = false
-            style = Paint.Style.FILL // or maybe some kind of outline text?
-            color = Color.WHITE // or maybe RED?
             textAlign = Paint.Align.CENTER
             typeface = Typeface.MONOSPACE
         }
@@ -102,17 +93,22 @@ class StopwatchText : View, AnkoLogger {
         verbose { "$shortName size change: $w,$h" }
         this._width = w
         this._height = h
-        val textSize = h * .9f
+
+        // TODO: dig deeper into font metrics and find a font size that guarantees we can fit all the chars
+        // http://stackoverflow.com/questions/5033012/auto-scale-textview-text-to-fit-within-bounds/17782522#17782522
+        val textSize = h * .6f
 
         verbose { "$shortName new text size: $textSize" }
 
         textPaint.textSize = textSize
-        textPaintAmbient.textSize = textSize
+
         //
         // note: metrics.ascent is a *negative* number while metrics.descent is a *positive* number
         //
         val metrics = textPaint.fontMetrics
-        textY = -metrics.ascent
+        val fontHeight = -metrics.ascent + metrics.descent
+        val leftoverHeight = h - fontHeight
+        textY = -metrics.ascent + leftoverHeight / 2f
         textX = w / 2f
 
         //
