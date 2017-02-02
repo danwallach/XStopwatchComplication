@@ -14,9 +14,9 @@ Finish stopwatch
 
     DONE! Weird issues with wide/short text: should we say "short only"?
 
-    TODO layout looks ugly on a square watchface
+    DONE layout looks ugly on a square watchface
 
-    TODO imagery/artwork for Play Store upload
+    DONE imagery/artwork for Play Store upload
 
 
 Add timer support
