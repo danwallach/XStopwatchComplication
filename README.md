@@ -1,8 +1,7 @@
-# XStopwatch / XTimer Complications
+# XStopwatch and Timer Complications
 
-This is a pair of complications for Android Wear 2.0, one of which does a
-stopwatch and the other of which does a timer, supporting multiple
-instances of each, active simultaneously. Once you
+This is a pair of complications for Android Wear 2.0, installed as a single app. Multiple
+instances of each may be active simultaneously. Once you
 add the complication to a watchface, clicking it will launch an activity where you can interact
 with it. When you go back to the watchface, everything should be properly updated.
 
