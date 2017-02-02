@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".TimerActivity"
-    tools:deviceIds="wear_square"
+    tools:deviceIds="wear_round"
     android:background="?android:attr/selectableItemBackgroundBorderless"
     android:id="@+id/constraintLayout">
 
@@ -34,7 +34,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintRight_toRightOf="parent"
         tools:layout_constraintRight_creator="1" />
 
@@ -48,7 +48,7 @@
         app:layout_constraintRight_toLeftOf="@+id/setButton"
         android:layout_marginRight="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="32dp" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginRight="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
 
@@ -79,6 +79,6 @@
         app:layout_constraintLeft_toRightOf="@+id/setButton"
         android:layout_marginLeft="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="32dp" />
 
 </android.support.constraint.ConstraintLayout>
