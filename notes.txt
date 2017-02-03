@@ -55,3 +55,5 @@ Verbose logging for all the things
     setprop log.tag.TimerState VERBOSE
     setprop log.tag.TimerProviderService VERBOSE
 
+Better text rendering?
+    Useful utility in Preview 5: android.support.wearable.complications.rendering.TextRenderer
