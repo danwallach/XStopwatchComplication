@@ -8,10 +8,10 @@ back to the watchface, everything should be properly updated.
 
 For earlier versions of Android Wear, I developed
 [a similar app](http://www.cs.rice.edu/~dwallach/xstopwatch/), which
-communicate with my
+communicated with my
 [CalWatch](http://www.cs.rice.edu/~dwallach/calwatch/) watchface. The
 code here has a lot in common with that project, but it's really a
-from-scratch implementation to support the new complication model of
+new implementation to support the new complication model of
 Wear 2.0. I haven't yet ported CalWatch to Android Wear 2.0.
 
 To any software developer / reader: everything here is implemented in
